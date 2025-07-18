@@ -1,0 +1,29 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+*.user
+*.suo
+*.userossc
+*.sln.docstates
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+Logs/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Entity Framework
+Migrations/
+
+# Temporary files
+*.tmp
+*.temp 

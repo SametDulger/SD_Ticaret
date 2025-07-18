@@ -1,0 +1,66 @@
+@model SDTicaret.Web.Models.OrderItemDto
+
+@{
+    ViewData["Title"] = "Sipariş Kalemi Ekle";
+}
+
+<h1>Sipariş Kalemi Ekle</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="OrderId" class="control-label">Sipariş</label>
+                <select asp-for="OrderId" class="form-control" required>
+                    <option value="">Sipariş Seçin</option>
+                    @if (ViewBag.Orders != null)
+                    {
+                        foreach (var order in ViewBag.Orders)
+                        {
+                            <option value="@order.Id">Sipariş #@order.Id - @order.TotalAmount.ToString("C")</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="ProductId" class="control-label">Ürün</label>
+                <select asp-for="ProductId" class="form-control" required>
+                    <option value="">Ürün Seçin</option>
+                    @if (ViewBag.Products != null)
+                    {
+                        foreach (var product in ViewBag.Products)
+                        {
+                            <option value="@product.Id" data-price="@product.Price">@product.Name - @product.Price.ToString("C")</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label">Miktar</label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="UnitPrice" class="control-label">Birim Fiyat</label>
+                <input asp-for="UnitPrice" class="form-control" />
+                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="submit" value="Ekle" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

@@ -1,0 +1,79 @@
+@model SDTicaret.Web.Models.StockDto
+
+@{
+    ViewData["Title"] = "Stok Düzenle";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Stok Düzenle</h1>
+    <p class="mb-4">Stok bilgilerini güncelleyin.</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Stok Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                
+                <div class="form-group">
+                    <label asp-for="ProductId" class="control-label">Ürün</label>
+                    <select asp-for="ProductId" class="form-control" required>
+                        <option value="">Ürün Seçin</option>
+                        @if (ViewBag.Products != null)
+                        {
+                            foreach (var product in ViewBag.Products)
+                            {
+                                <option value="@product.Id" selected="@(product.Id == Model.ProductId)">@product.Name - Stok: @product.Stock</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="BranchId" class="control-label">Şube</label>
+                    <select asp-for="BranchId" class="form-control" required>
+                        <option value="">Şube Seçin</option>
+                        @if (ViewBag.Branches != null)
+                        {
+                            foreach (var branch in ViewBag.Branches)
+                            {
+                                <option value="@branch.Id" selected="@(branch.Id == Model.BranchId)">@branch.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="BranchId" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label">Miktar</label>
+                    <input asp-for="Quantity" class="form-control" type="number" min="0" required />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="MinimumStock" class="control-label">Minimum Stok</label>
+                    <input asp-for="MinimumStock" class="form-control" type="number" min="0" required />
+                    <span asp-validation-for="MinimumStock" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="MaximumStock" class="control-label">Maksimum Stok</label>
+                    <input asp-for="MaximumStock" class="form-control" type="number" min="0" required />
+                    <span asp-validation-for="MaximumStock" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="submit" value="Güncelle" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

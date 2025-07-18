@@ -1,0 +1,57 @@
+@model SDTicaret.Web.Models.OrderDto
+
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Sipariş Detayı</h4>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Düzenle
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Geri
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Sipariş Bilgileri</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Sipariş No:</strong></td>
+                                    <td>@Model.Id</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Müşteri ID:</strong></td>
+                                    <td>@Model.CustomerId</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Toplam Tutar:</strong></td>
+                                    <td>@Model.TotalAmount.ToString("C")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Durum:</strong></td>
+                                    <td><span class="badge bg-success">Tamamlandı</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Sipariş Özeti</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                Bu sipariş başarıyla tamamlanmıştır.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

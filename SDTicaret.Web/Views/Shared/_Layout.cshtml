@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SDTicaret.Web</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SDTicaret.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SDTicaret.Web</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Ürün Yönetimi
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Ürünler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Kategoriler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Suppliers" asp-action="Index">Tedarikçiler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Stocks" asp-action="Index">Stoklar</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Satýþ Yönetimi
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="salesDropdown">
+                                <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index">Sipariþler</a></li>
+                                <li><a class="dropdown-item" asp-controller="OrderItems" asp-action="Index">Sipariþ Detaylarý</a></li>
+                                <li><a class="dropdown-item" asp-controller="Payments" asp-action="Index">Ödemeler</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Kiþi Yönetimi
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="peopleDropdown">
+                                <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index">Müþteriler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Çalýþanlar</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="businessDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Ýþ Yönetimi
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="businessDropdown">
+                                <li><a class="dropdown-item" asp-controller="Branches" asp-action="Index">Þubeler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Contracts" asp-action="Index">Sözleþmeler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Campaigns" asp-action="Index">Kampanyalar</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="feedbackDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Geri Bildirim
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="feedbackDropdown">
+                                <li><a class="dropdown-item" asp-controller="Complaints" asp-action="Index">Þikayetler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Surveys" asp-action="Index">Anketler</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetString("AccessToken") != null)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> @Context.Session.GetString("Username")
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Profile">Profil</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="ChangePassword">Þifre Deðiþtir</a></li>
+                                    @if (Context.Session.GetString("Role") == "Admin")
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Auth" asp-action="Users">Kullanýcý Yönetimi</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout">Çýkýþ Yap</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Giriþ Yap</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Kayýt Ol</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - SDTicaret.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,75 @@
+@model IEnumerable<SDTicaret.Web.Models.CampaignDto>
+
+@{
+    ViewData["Title"] = "Kampanya Yönetimi";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Kampanya Yönetimi</h1>
+    <p class="mb-4">Kampanyaları görüntüleyin ve yönetin.</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Kampanya Listesi</h6>
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Yeni Kampanya Ekle
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kampanya Adı</th>
+                            <th>Açıklama</th>
+                            <th>Başlangıç Tarihi</th>
+                            <th>Bitiş Tarihi</th>
+                            <th>İndirim Oranı</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.Description</td>
+                                <td>@item.StartDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
+                                <td>%@item.DiscountRate</td>
+                                <td>
+                                    @if (item.StartDate <= DateTime.Now && item.EndDate >= DateTime.Now)
+                                    {
+                                        <span class="badge badge-success">Aktif</span>
+                                    }
+                                    else if (item.StartDate > DateTime.Now)
+                                    {
+                                        <span class="badge badge-warning">Beklemede</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">Süresi Dolmuş</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 

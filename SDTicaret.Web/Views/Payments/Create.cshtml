@@ -1,0 +1,63 @@
+@model SDTicaret.Web.Models.PaymentDto
+
+@{
+    ViewData["Title"] = "Ödeme Ekle";
+}
+
+<h1>Ödeme Ekle</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="OrderId" class="control-label">Sipariş</label>
+                <select asp-for="OrderId" class="form-control" required>
+                    <option value="">Sipariş Seçin</option>
+                    @if (ViewBag.Orders != null)
+                    {
+                        foreach (var order in ViewBag.Orders)
+                        {
+                            <option value="@order.Id">Sipariş #@order.Id - @order.TotalAmount.ToString("C")</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label">Tutar</label>
+                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="PaymentDate" class="control-label">Ödeme Tarihi</label>
+                <input asp-for="PaymentDate" class="form-control" type="datetime-local" />
+                <span asp-validation-for="PaymentDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="PaymentType" class="control-label">Ödeme Türü</label>
+                <input asp-for="PaymentType" class="form-control" />
+                <span asp-validation-for="PaymentType" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="PaymentMethod" class="control-label">Ödeme Yöntemi</label>
+                <input asp-for="PaymentMethod" class="form-control" />
+                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="submit" value="Ekle" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

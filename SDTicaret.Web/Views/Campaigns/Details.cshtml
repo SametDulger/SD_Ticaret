@@ -1,0 +1,62 @@
+@model SDTicaret.Web.Models.CampaignDto
+
+@{
+    ViewData["Title"] = "Kampanya Detayları";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Kampanya Detayları</h1>
+    <p class="mb-4">Kampanya bilgilerini görüntüleyin.</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Kampanya Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+                
+                <dt class="col-sm-3">Kampanya Adı</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+                
+                <dt class="col-sm-3">Açıklama</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+                
+                <dt class="col-sm-3">Başlangıç Tarihi</dt>
+                <dd class="col-sm-9">@Model.StartDate.ToString("dd/MM/yyyy")</dd>
+                
+                <dt class="col-sm-3">Bitiş Tarihi</dt>
+                <dd class="col-sm-9">@Model.EndDate.ToString("dd/MM/yyyy")</dd>
+                
+                <dt class="col-sm-3">İndirim Oranı</dt>
+                <dd class="col-sm-9">%@Model.DiscountRate</dd>
+                
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">
+                    @if (Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now)
+                    {
+                        <span class="badge badge-success">Aktif</span>
+                    }
+                    else if (Model.StartDate > DateTime.Now)
+                    {
+                        <span class="badge badge-warning">Beklemede</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-secondary">Süresi Dolmuş</span>
+                    }
+                </dd>
+            </dl>
+            
+            <div class="mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Düzenle
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 
