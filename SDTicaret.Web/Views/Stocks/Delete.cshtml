@@ -1,0 +1,45 @@
+@model SDTicaret.Web.Models.StockDto
+
+@{
+    ViewData["Title"] = "Stok Sil";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Stok Sil</h1>
+    <p class="mb-4">Bu stok kaydını silmek istediğinizden emin misiniz?</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Stok Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+                
+                <dt class="col-sm-3">Ürün</dt>
+                <dd class="col-sm-9">@Model.ProductName</dd>
+                
+                <dt class="col-sm-3">Miktar</dt>
+                <dd class="col-sm-9">@Model.Quantity</dd>
+                
+                <dt class="col-sm-3">Minimum Stok</dt>
+                <dd class="col-sm-9">@Model.MinimumStock</dd>
+                
+                <dt class="col-sm-3">Maksimum Stok</dt>
+                <dd class="col-sm-9">@Model.MaximumStock</dd>
+            </dl>
+            
+            <form asp-action="Delete" class="mt-3">
+                <input type="hidden" asp-for="Id" />
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Uyarı:</strong> Bu işlem geri alınamaz. Stok kaydı kalıcı olarak silinecektir.
+                </div>
+                
+                <input type="submit" value="Sil" class="btn btn-danger" />
+                <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+            </form>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,271 @@
+@model IEnumerable<SDTicaret.Web.Models.UserDto>
+
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h3>Kullanıcı Yönetimi</h3>
+            <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-plus-circle"></i> Yeni Kullanıcı
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı Adı</th>
+                            <th>Ad Soyad</th>
+                            <th>E-posta</th>
+                            <th>Rol</th>
+                            <th>Durum</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.Id</td>
+                                <td>@user.Username</td>
+                                <td>@(user.FirstName + " " + user.LastName)</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    <span class="badge @(user.Role == "Admin" ? "bg-danger" : user.Role == "Employee" ? "bg-warning" : "bg-info")">
+                                        @user.Role
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(user.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(user.IsActive ? "Aktif" : "Pasif")
+                                    </span>
+                                </td>
+                                <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editUser(@user.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        @if (user.IsActive)
+                                        {
+                                            <button class="btn btn-sm btn-outline-warning" onclick="deactivateUser(@user.Id)">
+                                                <i class="bi bi-pause-circle"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-outline-success" onclick="activateUser(@user.Id)">
+                                                <i class="bi bi-play-circle"></i>
+                                            </button>
+                                        }
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(@user.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Kullanıcı Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addUserForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" name="Username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" class="form-control" name="Email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ad</label>
+                        <input type="text" class="form-control" name="FirstName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Soyad</label>
+                        <input type="text" class="form-control" name="LastName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select class="form-select" name="Role">
+                            <option value="Customer">Müşteri</option>
+                            <option value="Employee">Çalışan</option>
+                            <option value="Admin">Yönetici</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kullanıcı Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editUserForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId" name="Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" id="editUsername" name="Username" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ad</label>
+                        <input type="text" class="form-control" id="editFirstName" name="FirstName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Soyad</label>
+                        <input type="text" class="form-control" id="editLastName" name="LastName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select class="form-select" id="editRole" name="Role">
+                            <option value="Customer">Müşteri</option>
+                            <option value="Employee">Çalışan</option>
+                            <option value="Admin">Yönetici</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add User
+        document.getElementById('addUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const userData = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/api/auth/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Kullanıcı eklenirken hata oluştu');
+                }
+            } catch (error) {
+                alert('Bir hata oluştu');
+            }
+        });
+
+        // Edit User
+        function editUser(userId) {
+            // Burada kullanıcı bilgilerini getirip modal'ı doldur
+            // Şimdilik basit bir örnek
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserModal').classList.add('show');
+        }
+
+        // Activate User
+        async function activateUser(userId) {
+            if (confirm('Kullanıcıyı aktifleştirmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`/api/auth/users/${userId}/activate`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Kullanıcı aktifleştirilirken hata oluştu');
+                    }
+                } catch (error) {
+                    alert('Bir hata oluştu');
+                }
+            }
+        }
+
+        // Deactivate User
+        async function deactivateUser(userId) {
+            if (confirm('Kullanıcıyı deaktifleştirmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`/api/auth/users/${userId}/deactivate`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Kullanıcı deaktifleştirilirken hata oluştu');
+                    }
+                } catch (error) {
+                    alert('Bir hata oluştu');
+                }
+            }
+        }
+
+        // Delete User
+        async function deleteUser(userId) {
+            if (confirm('Kullanıcıyı silmek istediğinizden emin misiniz?')) {
+                try {
+                    const response = await fetch(`/api/auth/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Kullanıcı silinirken hata oluştu');
+                    }
+                } catch (error) {
+                    alert('Bir hata oluştu');
+                }
+            }
+        }
+    </script>
+} 
