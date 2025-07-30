@@ -126,6 +126,7 @@ builder.Services.AddScoped<IComplaintService, ComplaintService>();
 builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
 
 // Auth Services
 builder.Services.AddScoped<IAuthService, AuthService>();

@@ -162,7 +162,7 @@ namespace SDTicaret.Web.Controllers
                 ViewBag.Categories = categories;
                 ViewBag.Suppliers = suppliers;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.Categories = new List<CategoryDto>();
                 ViewBag.Suppliers = new List<SupplierDto>();
@@ -270,7 +270,7 @@ namespace SDTicaret.Web.Controllers
                 ViewBag.Categories = categories;
                 ViewBag.Suppliers = suppliers;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.Categories = new List<CategoryDto>();
                 ViewBag.Suppliers = new List<SupplierDto>();
