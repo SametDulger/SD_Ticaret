@@ -30,6 +30,34 @@ public class CategoriesController : ControllerBase
         }
     }
 
+    [HttpGet("main")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetMainCategories()
+    {
+        try
+        {
+            var categories = await _categoryService.GetMainCategoriesAsync();
+            return Ok(ApiResponse<IEnumerable<CategoryDto>>.SuccessResult(categories));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<IEnumerable<CategoryDto>>.ErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("tree")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetCategoryTree()
+    {
+        try
+        {
+            var categories = await _categoryService.GetCategoryTreeAsync();
+            return Ok(ApiResponse<IEnumerable<CategoryDto>>.SuccessResult(categories));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<IEnumerable<CategoryDto>>.ErrorResult(ex.Message));
+        }
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> GetById(int id)
     {
@@ -44,6 +72,34 @@ public class CategoriesController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, ApiResponse<CategoryDto>.ErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("{id}/subcategories")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetSubCategories(int id)
+    {
+        try
+        {
+            var categories = await _categoryService.GetSubCategoriesAsync(id);
+            return Ok(ApiResponse<IEnumerable<CategoryDto>>.SuccessResult(categories));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<IEnumerable<CategoryDto>>.ErrorResult(ex.Message));
+        }
+    }
+
+    [HttpGet("{id}/products")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<ProductDto>>>> GetProductsByCategory(int id)
+    {
+        try
+        {
+            var products = await _categoryService.GetProductsByCategoryAsync(id);
+            return Ok(ApiResponse<IEnumerable<ProductDto>>.SuccessResult(products));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<IEnumerable<ProductDto>>.ErrorResult(ex.Message));
         }
     }
 
@@ -89,6 +145,10 @@ public class CategoriesController : ControllerBase
                 return NotFound(ApiResponse<bool>.ErrorResult("Kategori bulunamadı"));
 
             return Ok(ApiResponse<bool>.SuccessResult(true, "Kategori başarıyla silindi"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse<bool>.ErrorResult(ex.Message));
         }
         catch (Exception ex)
         {

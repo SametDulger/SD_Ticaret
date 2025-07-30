@@ -33,6 +33,63 @@ namespace SDTicaret.Web.Controllers
             return View(new List<CategoryDto>());
         }
 
+        public async Task<IActionResult> Tree()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("categories/tree");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<CategoryDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View(apiResponse?.Data ?? new List<CategoryDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View(new List<CategoryDto>());
+        }
+
+        public async Task<IActionResult> SubCategories(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"categories/{id}/subcategories");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<CategoryDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View(apiResponse?.Data ?? new List<CategoryDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View(new List<CategoryDto>());
+        }
+
+        public async Task<IActionResult> ProductsByCategory(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"categories/{id}/products");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<ProductDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View(apiResponse?.Data ?? new List<ProductDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View(new List<ProductDto>());
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             try
@@ -52,8 +109,23 @@ namespace SDTicaret.Web.Controllers
             return NotFound();
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            try
+            {
+                // Ana kategorileri getir
+                var response = await _httpClient.GetAsync("categories/main");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<CategoryDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    ViewBag.MainCategories = apiResponse?.Data ?? new List<CategoryDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
             return View();
         }
 
@@ -95,6 +167,16 @@ namespace SDTicaret.Web.Controllers
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var apiResponse = JsonSerializer.Deserialize<ApiResponse<CategoryDto>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    
+                    // Ana kategorileri getir
+                    var mainCategoriesResponse = await _httpClient.GetAsync("categories/main");
+                    if (mainCategoriesResponse.IsSuccessStatusCode)
+                    {
+                        var mainContent = await mainCategoriesResponse.Content.ReadAsStringAsync();
+                        var mainApiResponse = JsonSerializer.Deserialize<ApiResponse<List<CategoryDto>>>(mainContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        ViewBag.MainCategories = mainApiResponse?.Data ?? new List<CategoryDto>();
+                    }
+                    
                     return View(apiResponse?.Data);
                 }
             }
