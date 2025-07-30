@@ -25,10 +25,30 @@ SD_Ticaret/
 - **Serilog** - Logging
 - **Swagger/OpenAPI** - API documentation
 - **xUnit** - Testing framework
+- **Bootstrap 5** - UI Framework
 
 ## 🔧 Kurulum
 
 Detaylı kurulum rehberi için [SETUP.md](SETUP.md) dosyasına bakın.
+
+### Hızlı Başlangıç
+
+```bash
+# Projeyi klonlayın
+git clone <repository-url>
+cd SD_Ticaret
+
+# Veritabanını oluşturun
+cd SDTicaret.API
+dotnet ef database update
+
+# API'yi çalıştırın
+dotnet run
+
+# Yeni terminal açın ve Web uygulamasını çalıştırın
+cd ../SDTicaret.Web
+dotnet run
+```
 
 ## 📝 API Dokümantasyonu
 
@@ -39,21 +59,38 @@ Swagger UI: `https://localhost:7244/swagger`
 ```bash
 # Tüm testleri çalıştır
 dotnet test
-
-# Sadece unit testler
-dotnet test --filter Category=Unit
-
-# Sadece integration testler
-dotnet test --filter Category=Integration
 ```
 
 ## 📦 Deployment
 
-### Docker
+### Docker ile Deployment
+
 ```bash
-docker build -t sdticaret .
-docker run -p 8080:80 sdticaret
+# Docker Compose ile tüm servisleri başlatın
+docker-compose up -d
 ```
+
+### Manuel Deployment
+
+```bash
+# Production build
+dotnet publish -c Release
+```
+
+## 🎨 Özellikler
+
+- **Ürün Yönetimi**: Ürünler, kategoriler, tedarikçiler
+- **Satış Yönetimi**: Siparişler, ödemeler
+- **Kişi Yönetimi**: Müşteriler, çalışanlar
+- **İş Yönetimi**: Şubeler, sözleşmeler, kampanyalar
+- **Raporlama**: Dashboard, satış, stok, müşteri raporları
+- **Güvenlik**: JWT authentication, rate limiting
+
+## 🌐 Erişim URL'leri
+
+- **Web Uygulaması**: `https://localhost:5244`
+- **API**: `https://localhost:7244`
+- **Swagger UI**: `https://localhost:7244/swagger`
 
 ## 📄 Lisans
 

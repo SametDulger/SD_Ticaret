@@ -2,24 +2,15 @@
 [Bb]in/
 [Oo]bj/
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 x64/
 x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
 bld/
 
 # Visual Studio files
 *.user
-*.userossc
-*.sln.docstates
-*.userprefs
 *.suo
 *.pidb
-*.booproj
 *.svclog
 *.scc
 *.rsuser
@@ -28,7 +19,6 @@ bld/
 
 # Visual Studio directories
 .vs/
-Generated\ Files/
 
 # Visual Studio Code
 .vscode/
@@ -46,29 +36,12 @@ Generated\ Files/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# NUnit
-*.VisualState.xml
-TestResult.xml
-nunit-*.xml
-
-# Benchmark Results
-BenchmarkDotNet.Artifacts/
-
 # .NET Core
 project.lock.json
 project.fragment.lock.json
 artifacts/
 
-# ASP.NET Scaffolding
-ScaffoldingReadMe.txt
-
-# StyleCop
-StyleCopReport.xml
-
 # Files built by Visual Studio
-*_i.c
-*_p.c
-*_h.h
 *.ilk
 *.meta
 *.obj
@@ -85,14 +58,13 @@ StyleCopReport.xml
 *.tlh
 *.tmp
 *.tmp_proj
-*_wpftmp.csproj
 *.log
 *.tlog
 *.vspscc
 *.vssscc
 .builds
 
-# Visual C++ cache files
+# Visual Studio cache files
 ipch/
 *.aps
 *.ncb
@@ -112,19 +84,10 @@ ipch/
 # Visual Studio Trace Files
 *.e2e
 
-# TFS 2012 Local Workspace
-$tf/
-
-# Guidance Automation Toolkit
-*.gpState
-
 # ReSharper
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-
-# TeamCity
-_TeamCity*
 
 # Code Coverage Tools
 *.dotCover
@@ -142,25 +105,8 @@ _NCrunch_*
 .*crunch*.local.xml
 nCrunchTemp_*
 
-# MightyMoose
-*.mm.*
-AutoTest.Net/
-
 # Web workbench (sass)
 .sass-cache/
-
-# Installshield output folder
-[Ee]xpress/
-
-# DocProject
-DocProject/buildhelp/
-DocProject/Help/*.HxT
-DocProject/Help/*.HxC
-DocProject/Help/*.hhc
-DocProject/Help/*.hhk
-DocProject/Help/*.hhp
-DocProject/Help/Html2
-DocProject/Help/html
 
 # Publish Web Output
 *.[Pp]ublish.xml
@@ -198,9 +144,6 @@ ClientBin/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
-
-# RIA/Silverlight projects
-Generated_Code/
 
 # Backup & report files
 _UpgradeReport_Files/
@@ -318,7 +261,7 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# Entity Framework
+# Entity Framework Migrations
 Migrations/
 
 # Logs
@@ -339,8 +282,7 @@ packages/
 .env.test.local
 .env.production.local
 
-# Docker
-.dockerignore
+# Docker (ignore override files but keep main files)
 Dockerfile.dev
 docker-compose.override.yml
 
@@ -348,6 +290,8 @@ docker-compose.override.yml
 *.temp
 *.swp
 *.swo
+*.bak
+*.backup
 
 # OS generated files
 .DS_Store
@@ -368,6 +312,38 @@ coverage/
 *.perf
 *.perfdata
 
-# Application specific
+# Application specific - ignore actual config files but keep examples
 appsettings.json
-appsettings.*.json 
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Keep example files
+!appsettings.example.json
+!appsettings.Development.example.json
+
+# Build artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+*.tmp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Lock files
+*.lock
+package-lock.json
+yarn.lock
+
+# Runtime files
+*.runtimeconfig.json
+*.runtimeconfig.dev.json 

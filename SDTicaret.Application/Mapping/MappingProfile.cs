@@ -24,5 +24,12 @@ public class MappingProfile : Profile
         CreateMap<Campaign, CampaignDto>().ReverseMap();
         CreateMap<Stock, StockDto>().ReverseMap();
         CreateMap<User, UserDto>().ReverseMap();
+        
+        // Reporting mappings
+        CreateMap<Order, RecentOrderDto>()
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => ""))
+            .ForMember(dest => dest.OrderNumber, opt => opt.MapFrom(src => src.OrderNumber ?? src.Id.ToString()));
+        
+        CreateMap<StockMovement, StockMovementDto>().ReverseMap();
     }
 } 
