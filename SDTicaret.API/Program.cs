@@ -17,13 +17,10 @@ using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog konfigürasyonu 
+// Basit Serilog konfigürasyonu
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-    .Enrich.FromLogContext()
+    .MinimumLevel.Information()
     .WriteTo.Console()
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -147,8 +144,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 // Global exception handling
 app.UseMiddleware<ExceptionHandlingMiddleware>();

@@ -1,0 +1,257 @@
+@model SDTicaret.Web.Models.SalesReportDto
+@{
+    ViewData["Title"] = "Satış Raporu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-graph-up text-primary me-2"></i>
+                    Satış Raporu
+                </h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="exportToPDF()">
+                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tarih Filtresi -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="startDate" class="form-label">Başlangıç Tarihi</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" 
+                                   value="@Model.StartDate.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="endDate" class="form-label">Bitiş Tarihi</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" 
+                                   value="@Model.EndDate.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search me-1"></i>Filtrele
+                            </button>
+                            <a href="@Url.Action("Sales")" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Sıfırla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Özet Kartları -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Toplam Satış
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalSales.ToString("C")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-currency-dollar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Toplam Sipariş
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalOrders</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Toplam Müşteri
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCustomers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-people fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Ortalama Sipariş Değeri
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.AverageOrderValue.ToString("C")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-calculator fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Günlük Satışlar -->
+    @if (Model.DailySales != null && Model.DailySales.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-calendar me-2"></i>
+                            Günlük Satışlar
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dailySalesTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Toplam Satış</th>
+                                        <th>Sipariş Sayısı</th>
+                                        <th>Müşteri Sayısı</th>
+                                        <th>Ortalama Sipariş</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var daily in Model.DailySales)
+                                    {
+                                        <tr>
+                                            <td>@daily.Date.ToString("dd.MM.yyyy")</td>
+                                                                                         <td>@daily.Sales.ToString("C")</td>
+                                             <td>@daily.Orders</td>
+                                             <td>@daily.Customers</td>
+                                             <td>@((daily.Sales / daily.Orders).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Kategori Satışları -->
+    @if (Model.CategorySales != null && Model.CategorySales.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-tags me-2"></i>
+                            Kategori Satışları
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="categorySalesTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Kategori</th>
+                                        <th>Toplam Satış</th>
+                                        <th>Sipariş Sayısı</th>
+                                        <th>Ürün Sayısı</th>
+                                        <th>Ortalama Sipariş</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.CategorySales)
+                                    {
+                                        <tr>
+                                            <td>@category.CategoryName</td>
+                                                                                         <td>@category.Sales.ToString("C")</td>
+                                             <td>@category.Orders</td>
+                                             <td>@category.Products</td>
+                                             <td>@((category.Sales / category.Orders).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function exportToPDF() {
+            alert('PDF export özelliği yakında eklenecek.');
+        }
+
+        function exportToExcel() {
+            alert('Excel export özelliği yakında eklenecek.');
+        }
+
+        $(document).ready(function() {
+            $('#dailySalesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[0, 'desc']]
+            });
+
+            $('#categorySalesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[1, 'desc']]
+            });
+        });
+    </script>
+} 

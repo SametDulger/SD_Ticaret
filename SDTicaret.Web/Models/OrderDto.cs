@@ -27,6 +27,7 @@ public class OrderDto
     public decimal DiscountAmount { get; set; }
     public decimal FinalAmount { get; set; }
     public int ItemCount { get; set; }
+    public bool IsActive { get; set; } = true;
     public ICollection<OrderItemDto>? OrderItems { get; set; }
     public ICollection<OrderStatusHistoryDto>? StatusHistory { get; set; }
 } 

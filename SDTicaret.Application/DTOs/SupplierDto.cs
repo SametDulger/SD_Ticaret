@@ -8,4 +8,6 @@ public class SupplierDto
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
+    public int ProductCount { get; set; } = 0;
+    public bool IsActive { get; set; } = true;
 } 

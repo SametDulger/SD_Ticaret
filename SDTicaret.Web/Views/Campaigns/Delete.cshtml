@@ -5,12 +5,12 @@
 }
 
 <div class="container-fluid">
-    <h1 class="h3 mb-2 text-gray-800">Kampanya Sil</h1>
+    <h1 class="h3 mb-2">Kampanya Sil</h1>
     <p class="mb-4">Bu kampanyayı silmek istediğinizden emin misiniz?</p>
 
-    <div class="card shadow mb-4">
+    <div class="card border-0 shadow-sm mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Kampanya Bilgileri</h6>
+            <h6 class="m-0 fw-bold text-primary">Kampanya Bilgileri</h6>
         </div>
         <div class="card-body">
             <dl class="row">
@@ -36,7 +36,7 @@
             <form asp-action="Delete" class="mt-3">
                 <input type="hidden" asp-for="Id" />
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="bi bi-exclamation-triangle"></i>
                     <strong>Uyarı:</strong> Bu işlem geri alınamaz. Kampanya kalıcı olarak silinecektir.
                 </div>
                 

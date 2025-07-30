@@ -5,58 +5,153 @@
 }
 
 <div class="container-fluid">
-    <h1 class="h3 mb-2 text-gray-800">Kampanya Detayları</h1>
-    <p class="mb-4">Kampanya bilgilerini görüntüleyin.</p>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-megaphone me-2"></i>
+                Kampanya Detayları
+            </h1>
+            <p class="text-muted mb-0">Kampanya bilgilerini görüntüleyin</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Edit", "Campaigns", new { id = Model.Id })" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-pencil me-1"></i>
+                Düzenle
+            </a>
+            <a href="@Url.Action("Index", "Campaigns")" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>
+                Geri Dön
+            </a>
+        </div>
+    </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Kampanya Bilgileri</h6>
+    <!-- Campaign Details Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Kampanya Bilgileri
+            </h5>
         </div>
         <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">ID</dt>
-                <dd class="col-sm-9">@Model.Id</dd>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-primary bg-opacity-10 rounded me-3">
+                            <i class="bi bi-megaphone text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Kampanya Adı</h6>
+                            <p class="text-muted mb-0">@Model.Name</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">Kampanya Adı</dt>
-                <dd class="col-sm-9">@Model.Name</dd>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-success bg-opacity-10 rounded me-3">
+                            <i class="bi bi-hash text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Kampanya ID</h6>
+                            <p class="text-muted mb-0">#@Model.Id</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">Açıklama</dt>
-                <dd class="col-sm-9">@Model.Description</dd>
+                <div class="col-12">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-info bg-opacity-10 rounded me-3">
+                            <i class="bi bi-text-paragraph text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Açıklama</h6>
+                            <p class="text-muted mb-0">@Model.Description</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">Başlangıç Tarihi</dt>
-                <dd class="col-sm-9">@Model.StartDate.ToString("dd/MM/yyyy")</dd>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-warning bg-opacity-10 rounded me-3">
+                            <i class="bi bi-calendar-event text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Başlangıç Tarihi</h6>
+                            <p class="text-muted mb-0">@Model.StartDate.ToString("dd.MM.yyyy")</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">Bitiş Tarihi</dt>
-                <dd class="col-sm-9">@Model.EndDate.ToString("dd/MM/yyyy")</dd>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-danger bg-opacity-10 rounded me-3">
+                            <i class="bi bi-calendar-x text-danger"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Bitiş Tarihi</h6>
+                            <p class="text-muted mb-0">@Model.EndDate.ToString("dd.MM.yyyy")</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">İndirim Oranı</dt>
-                <dd class="col-sm-9">%@Model.DiscountRate</dd>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="campaign-icon bg-info bg-opacity-10 rounded me-3">
+                            <i class="bi bi-percent text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">İndirim Oranı</h6>
+                            <p class="text-muted mb-0">%@Model.DiscountRate</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <dt class="col-sm-3">Durum</dt>
-                <dd class="col-sm-9">
-                    @if (Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now)
-                    {
-                        <span class="badge badge-success">Aktif</span>
-                    }
-                    else if (Model.StartDate > DateTime.Now)
-                    {
-                        <span class="badge badge-warning">Beklemede</span>
-                    }
-                    else
-                    {
-                        <span class="badge badge-secondary">Süresi Dolmuş</span>
-                    }
-                </dd>
-            </dl>
-            
-            <div class="mt-3">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Düzenle
-                </a>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Geri Dön
-                </a>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="campaign-icon bg-@(Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now ? "success" : Model.StartDate > DateTime.Now ? "warning" : "secondary") bg-opacity-10 rounded me-3">
+                            <i class="bi bi-@(Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now ? "check-circle" : Model.StartDate > DateTime.Now ? "clock" : "x-circle") text-@(Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now ? "success" : Model.StartDate > DateTime.Now ? "warning" : "secondary")"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Kampanya Durumu</h6>
+                            <span class="badge bg-@(Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now ? "success" : Model.StartDate > DateTime.Now ? "warning" : "secondary")">
+                                @if (Model.StartDate <= DateTime.Now && Model.EndDate >= DateTime.Now)
+                                {
+                                    <span>Aktif</span>
+                                }
+                                else if (Model.StartDate > DateTime.Now)
+                                {
+                                    <span>Beklemede</span>
+                                }
+                                else
+                                {
+                                    <span>Süresi Dolmuş</span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<style>
+    .campaign-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .card {
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+</style> 

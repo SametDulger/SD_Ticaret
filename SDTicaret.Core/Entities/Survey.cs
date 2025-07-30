@@ -10,4 +10,5 @@ public class Survey : BaseEntity
     public int Rating { get; set; }
     public string? Comment { get; set; }
     public DateTime SurveyDate { get; set; }
+    public int ParticipantCount { get; set; } = 1;
 } 

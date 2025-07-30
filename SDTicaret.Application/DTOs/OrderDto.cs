@@ -7,7 +7,7 @@ public class OrderDto
     public string? CustomerName { get; set; }
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
-    public string OrderStatus { get; set; } = string.Empty;
+    public string OrderStatus { get; set; } = "Pending";
     public string? OrderNumber { get; set; }
     public string? ShippingAddress { get; set; }
     public string? BillingAddress { get; set; }
@@ -27,6 +27,7 @@ public class OrderDto
     public decimal DiscountAmount { get; set; }
     public decimal FinalAmount { get; set; }
     public int ItemCount { get; set; }
+    public bool IsActive { get; set; } = true;
     public ICollection<OrderItemDto>? OrderItems { get; set; }
     public ICollection<OrderStatusHistoryDto>? StatusHistory { get; set; }
 } 

@@ -1,0 +1,198 @@
+@model SDTicaret.Web.Models.DashboardStatsDto
+
+@{
+    ViewData["Title"] = "Raporlar";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="bi bi-graph-up me-2"></i>
+                Raporlar
+            </h1>
+            <p class="text-muted mb-0">Sistem istatistikleri ve raporları</p>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Total Sales -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Toplam Satış</h6>
+                            <h4 class="mb-0">₺@Model.TotalSales.ToString("N2")</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Toplam Sipariş</h6>
+                            <h4 class="mb-0">@Model.TotalOrders.ToString()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Products -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-box"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Toplam Ürün</h6>
+                            <h4 class="mb-0">@Model.TotalProducts.ToString()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Toplam Müşteri</h6>
+                            <h4 class="mb-0">@Model.TotalCustomers.ToString()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Sections -->
+    <div class="row g-4">
+        <!-- Sales Report -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Satış Raporu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Detaylı satış raporları ve analizler</p>
+                    <a href="@Url.Action("Sales", "Reports")" class="btn btn-primary">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        Satış Raporunu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Report -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-boxes me-2"></i>
+                        Stok Raporu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Stok durumu ve envanter raporları</p>
+                    <a href="@Url.Action("Inventory", "Reports")" class="btn btn-success">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        Stok Raporunu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Report -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people-fill me-2"></i>
+                        Müşteri Raporu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Müşteri analizi ve davranış raporları</p>
+                    <a href="@Url.Action("Customers", "Reports")" class="btn btn-primary">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        Müşteri Raporunu Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        Dashboard
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Genel sistem durumu ve özet bilgiler</p>
+                    <a href="@Url.Action("Index", "Dashboard")" class="btn btn-warning">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        Dashboard'a Git
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+</style> 

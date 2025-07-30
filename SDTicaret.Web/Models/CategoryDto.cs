@@ -9,4 +9,5 @@ public class CategoryDto
     public CategoryDto? ParentCategory { get; set; }
     public ICollection<CategoryDto>? SubCategories { get; set; }
     public int ProductCount { get; set; }
+    public bool IsActive { get; set; } = true;
 } 

@@ -1,12 +1,350 @@
-﻿// SDTicaret Web Application JavaScript
-// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿// SDTicaret Modern Web Application JavaScript
+// Combined with modern enhancements and legacy compatibility
 
 // Global variables
 let currentPage = 1;
 let pageSize = 10;
 
-// Utility functions
+// Modern SDTicaret UI Class
+class SDTicaretUI {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupAnimations();
+        this.setupInteractions();
+        this.setupNotifications();
+        this.setupLoadingStates();
+        this.setupSearchFunctionality();
+        this.setupResponsiveBehavior();
+    }
+
+    // Animasyonlar
+    setupAnimations() {
+        // Sayfa yüklendiğinde fade-in animasyonu
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Scroll animasyonları
+        this.setupScrollAnimations();
+    }
+
+    setupScrollAnimations() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Animasyon için elementleri gözlemle
+        document.querySelectorAll('.card, .dashboard-card, .product-item').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    // Etkileşimler
+    setupInteractions() {
+        // Hover efektleri
+        this.setupHoverEffects();
+        
+        // Click efektleri
+        this.setupClickEffects();
+        
+        // Form validasyonları
+        this.setupFormValidation();
+    }
+
+    setupHoverEffects() {
+        // Kart hover efektleri
+        document.querySelectorAll('.card, .dashboard-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+                this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '';
+            });
+        });
+
+        // Buton hover efektleri
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('btn-loading')) {
+                    this.style.transform = 'translateY(-2px)';
+                }
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    }
+
+    setupClickEffects() {
+        // Ripple efekti
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn')) {
+                this.createRipple(e);
+            }
+        });
+    }
+
+    createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
+
+    setupFormValidation() {
+        // Real-time form validation
+        document.querySelectorAll('form').forEach(form => {
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    this.validateField(input);
+                });
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('is-invalid')) {
+                        this.validateField(input);
+                    }
+                });
+            });
+        });
+    }
+
+    validateField(field) {
+        const value = field.value.trim();
+        const fieldName = field.name;
+        let isValid = true;
+        let errorMessage = '';
+
+        // Temel validasyon kuralları
+        switch (fieldName) {
+            case 'Username':
+                if (value.length < 3) {
+                    isValid = false;
+                    errorMessage = 'Kullanıcı adı en az 3 karakter olmalıdır.';
+                }
+                break;
+            case 'Email':
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    isValid = false;
+                    errorMessage = 'Geçerli bir e-posta adresi giriniz.';
+                }
+                break;
+            case 'Password':
+                if (value.length < 6) {
+                    isValid = false;
+                    errorMessage = 'Şifre en az 6 karakter olmalıdır.';
+                }
+                break;
+        }
+
+        this.showFieldValidation(field, isValid, errorMessage);
+    }
+
+    showFieldValidation(field, isValid, message) {
+        const feedback = field.parentNode.querySelector('.invalid-feedback') || 
+                        field.parentNode.querySelector('.valid-feedback');
+
+        if (feedback) {
+            feedback.remove();
+        }
+
+        field.classList.remove('is-valid', 'is-invalid');
+
+        if (isValid) {
+            field.classList.add('is-valid');
+        } else {
+            field.classList.add('is-invalid');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            errorDiv.textContent = message;
+            field.parentNode.appendChild(errorDiv);
+        }
+    }
+
+    // Bildirimler
+    setupNotifications() {
+        // Toast bildirimleri
+        this.createToastContainer();
+    }
+
+    createToastContainer() {
+        if (!document.getElementById('toast-container')) {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+        }
+    }
+
+    showToast(message, type = 'info', duration = 5000) {
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.id = toastId;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+
+        const bsToast = new bootstrap.Toast(toast, { delay: duration });
+        bsToast.show();
+
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    }
+
+    // Loading durumları
+    setupLoadingStates() {
+        // Form submit loading
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    this.setButtonLoading(submitBtn, true);
+                }
+            });
+        });
+
+        // Link loading
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.classList.contains('btn') && !link.classList.contains('btn-loading')) {
+                    this.setButtonLoading(link, true);
+                }
+            });
+        });
+    }
+
+    setButtonLoading(button, isLoading) {
+        if (isLoading) {
+            const originalText = button.innerHTML;
+            button.dataset.originalText = originalText;
+            button.innerHTML = '<span class="loading me-2"></span>Yükleniyor...';
+            button.disabled = true;
+            button.classList.add('btn-loading');
+        } else {
+            button.innerHTML = button.dataset.originalText || button.innerHTML;
+            button.disabled = false;
+            button.classList.remove('btn-loading');
+        }
+    }
+
+    // Arama fonksiyonalitesi
+    setupSearchFunctionality() {
+        const searchInputs = document.querySelectorAll('input[type="search"], #searchInput');
+        
+        searchInputs.forEach(input => {
+            let debounceTimer;
+            
+            input.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    this.performSearch(e.target.value, input.dataset.target);
+                }, 300);
+            });
+        });
+    }
+
+    performSearch(query, targetSelector) {
+        const targetElements = document.querySelectorAll(targetSelector || '.searchable-item');
+        
+        targetElements.forEach(element => {
+            const text = element.textContent.toLowerCase();
+            const matches = text.includes(query.toLowerCase());
+            
+            if (matches) {
+                element.style.display = '';
+                element.classList.remove('search-hidden');
+            } else {
+                element.style.display = 'none';
+                element.classList.add('search-hidden');
+            }
+        });
+    }
+
+    // Responsive davranış
+    setupResponsiveBehavior() {
+        // Sidebar toggle
+        const sidebarToggle = document.querySelector('[data-bs-toggle="collapse"]');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+        }
+
+        // Mobile menu
+        const mobileMenuToggle = document.querySelector('.navbar-toggler');
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', () => {
+                document.body.classList.toggle('mobile-menu-open');
+            });
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+    }
+
+    handleResize() {
+        const width = window.innerWidth;
+        
+        if (width < 768) {
+            document.body.classList.add('mobile-view');
+        } else {
+            document.body.classList.remove('mobile-view');
+        }
+    }
+}
+
+// Legacy Utility functions (for backward compatibility)
 const SDTicaret = {
     // Show loading spinner
     showLoading: function(element) {
@@ -192,6 +530,123 @@ const SDTicaret = {
     }
 };
 
+// Modern Utility Class
+class SDTicaretUtils {
+    static formatCurrency(amount, currency = 'TRY') {
+        return new Intl.NumberFormat('tr-TR', {
+            style: 'currency',
+            currency: currency
+        }).format(amount);
+    }
+
+    static formatDate(date, options = {}) {
+        const defaultOptions = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        
+        return new Intl.DateTimeFormat('tr-TR', { ...defaultOptions, ...options }).format(new Date(date));
+    }
+
+    static debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    static throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
+    static copyToClipboard(text) {
+        if (navigator.clipboard) {
+            return navigator.clipboard.writeText(text);
+        } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return Promise.resolve();
+        }
+    }
+
+    static downloadFile(url, filename) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Modern API Helper Class
+class SDTicaretAPI {
+    static async request(url, options = {}) {
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        };
+
+        const config = { ...defaultOptions, ...options };
+
+        try {
+            const response = await fetch(url, config);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    }
+
+    static get(url) {
+        return this.request(url, { method: 'GET' });
+    }
+
+    static post(url, data) {
+        return this.request(url, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    static put(url, data) {
+        return this.request(url, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    static delete(url) {
+        return this.request(url, { method: 'DELETE' });
+    }
+}
+
 // Table functionality
 const TableManager = {
     // Initialize table with sorting and filtering
@@ -366,6 +821,9 @@ const DashboardManager = {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modern UI
+    window.sdTicaretUI = new SDTicaretUI();
+    
     // Initialize table managers
     document.querySelectorAll('table[data-sortable]').forEach(table => {
         TableManager.init(table.id);
@@ -409,8 +867,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
 });
 
+// Global error handler - only for critical errors
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    
+    // Ignore errors from dropdown interactions
+    if (event.target && event.target.closest('.dropdown')) {
+        return;
+    }
+    
+    // Only show error for critical errors
+    if (event.error && event.error.message && !event.error.message.includes('dropdown')) {
+        if (window.sdTicaretUI) {
+            window.sdTicaretUI.showToast('Bir hata oluştu. Lütfen sayfayı yenileyin.', 'danger');
+        }
+    }
+});
+
+// Unhandled promise rejection handler - only for API errors
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    
+    // Only show error for API-related rejections
+    if (event.reason && typeof event.reason === 'object' && event.reason.message) {
+        if (window.sdTicaretUI) {
+            window.sdTicaretUI.showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger');
+        }
+    }
+});
+
 // Export for global access
 window.SDTicaret = SDTicaret;
+window.SDTicaretUtils = SDTicaretUtils;
+window.SDTicaretAPI = SDTicaretAPI;
 window.TableManager = TableManager;
 window.FormManager = FormManager;
 window.DashboardManager = DashboardManager;

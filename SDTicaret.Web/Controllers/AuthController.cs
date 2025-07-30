@@ -8,13 +8,10 @@ namespace SDTicaret.Web.Controllers;
 public class AuthController : Controller
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
 
-    public AuthController(IConfiguration configuration)
+    public AuthController(IHttpClientFactory httpClientFactory)
     {
-        _configuration = configuration;
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri(_configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5080/api/");
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
     }
 
     [HttpGet]
@@ -24,43 +21,87 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginDto loginDto)
+    public async Task<IActionResult> Login([FromForm] LoginDto loginDto)
     {
+        Console.WriteLine("=== LOGIN ACTION STARTED ===");
+        Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+        
         if (!ModelState.IsValid)
+        {
+            Console.WriteLine("ModelState is invalid:");
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"Error: {error.ErrorMessage}");
+            }
             return View(loginDto);
+        }
+
+        Console.WriteLine($"LoginDto received - Username: '{loginDto?.Username}', Password length: {loginDto?.Password?.Length}");
+        Console.WriteLine($"Request.Form keys: {string.Join(", ", Request.Form.Keys)}");
+        Console.WriteLine($"Request.Form values: {string.Join(", ", Request.Form.Select(kv => $"{kv.Key}={kv.Value}"))}");
+        
+        if (loginDto == null)
+        {
+            Console.WriteLine("LoginDto is null!");
+            ModelState.AddModelError("", "Form verileri alınamadı");
+            return View();
+        }
 
         try
         {
             var json = JsonSerializer.Serialize(loginDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/auth/login", content);
+            Console.WriteLine($"Login attempt for user: {loginDto.Username}");
+            Console.WriteLine($"Request URL: {_httpClient.BaseAddress}auth/login");
+            Console.WriteLine($"Request JSON: {json}");
+            Console.WriteLine($"Content-Type: {content.Headers.ContentType}");
+            Console.WriteLine($"Content-Length: {content.Headers.ContentLength}");
+            
+            var response = await _httpClient.PostAsync("auth/login", content);
+            
+            Console.WriteLine($"Response Status: {response.StatusCode}");
+            Console.WriteLine($"Response Headers: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={string.Join(",", h.Value)}"))}");
+            
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response Content: {responseContent}");
             
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var tokenDto = JsonSerializer.Deserialize<TokenDto>(responseContent, new JsonSerializerOptions
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<TokenDto>>(responseContent, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                if (tokenDto != null)
+                if (apiResponse?.Data != null)
                 {
-                    HttpContext.Session.SetString("AccessToken", tokenDto.AccessToken);
-                    HttpContext.Session.SetString("RefreshToken", tokenDto.RefreshToken);
-                    HttpContext.Session.SetString("Username", tokenDto.Username);
-                    HttpContext.Session.SetString("Role", tokenDto.Role);
+                    HttpContext.Session.SetString("AccessToken", apiResponse.Data.AccessToken);
+                    HttpContext.Session.SetString("RefreshToken", apiResponse.Data.RefreshToken);
+                    HttpContext.Session.SetString("Username", apiResponse.Data.Username);
+                    HttpContext.Session.SetString("Role", apiResponse.Data.Role);
 
-                    return RedirectToAction("Index", "Home");
+                    Console.WriteLine($"Login successful for user: {apiResponse.Data.Username}");
+                    return RedirectToAction("Index", "Dashboard");
+                }
+                else
+                {
+                    Console.WriteLine($"API response data is null. Message: {apiResponse?.Message}");
+                    ModelState.AddModelError("", apiResponse?.Message ?? "Giriş başarısız");
                 }
             }
+            else
+            {
+                Console.WriteLine($"Login failed with status: {response.StatusCode}");
+                ModelState.AddModelError("", $"Giriş başarısız: {response.StatusCode}");
+            }
 
-            ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı");
             return View(loginDto);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            ModelState.AddModelError("", "Giriş yapılırken bir hata oluştu");
+            Console.WriteLine($"Login exception: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            ModelState.AddModelError("", $"Giriş yapılırken bir hata oluştu: {ex.Message}");
             return View(loginDto);
         }
     }
@@ -82,7 +123,7 @@ public class AuthController : Controller
             var json = JsonSerializer.Serialize(registerDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/auth/register", content);
+            var response = await _httpClient.PostAsync("auth/register", content);
             
             if (response.IsSuccessStatusCode)
             {
@@ -115,7 +156,7 @@ public class AuthController : Controller
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Login", "Auth");
     }
 
     [HttpGet("profile")]
@@ -128,7 +169,7 @@ public class AuthController : Controller
         try
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.GetAsync("api/auth/me");
+            var response = await _httpClient.GetAsync("auth/me");
             
             if (response.IsSuccessStatusCode)
             {
@@ -166,7 +207,7 @@ public class AuthController : Controller
             var json = JsonSerializer.Serialize(userDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync("api/auth/profile", content);
+            var response = await _httpClient.PutAsync("auth/profile", content);
             
             if (response.IsSuccessStatusCode)
             {
@@ -207,7 +248,7 @@ public class AuthController : Controller
             var json = JsonSerializer.Serialize(changePasswordDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/auth/change-password", content);
+            var response = await _httpClient.PostAsync("auth/change-password", content);
             
             if (response.IsSuccessStatusCode)
             {
@@ -253,7 +294,7 @@ public class AuthController : Controller
             var json = JsonSerializer.Serialize(forgotPasswordDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/auth/forgot-password", content);
+            var response = await _httpClient.PostAsync("auth/forgot-password", content);
             
             if (response.IsSuccessStatusCode)
             {
@@ -295,7 +336,7 @@ public class AuthController : Controller
             var json = JsonSerializer.Serialize(resetPasswordDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("api/auth/reset-password", content);
+            var response = await _httpClient.PostAsync("auth/reset-password", content);
             
             if (response.IsSuccessStatusCode)
             {
@@ -336,7 +377,7 @@ public class AuthController : Controller
         try
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.GetAsync("api/users");
+            var response = await _httpClient.GetAsync("users");
             
             if (response.IsSuccessStatusCode)
             {
@@ -369,7 +410,7 @@ public class AuthController : Controller
         try
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.PutAsync($"api/users/{id}/activate", null);
+            var response = await _httpClient.PutAsync($"users/{id}/activate", null);
             
             if (response.IsSuccessStatusCode)
             {
@@ -400,7 +441,7 @@ public class AuthController : Controller
         try
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.PutAsync($"api/users/{id}/deactivate", null);
+            var response = await _httpClient.PutAsync($"users/{id}/deactivate", null);
             
             if (response.IsSuccessStatusCode)
             {
