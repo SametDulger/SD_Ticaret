@@ -15,7 +15,6 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
-    private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
 
     public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IJwtService jwtService, IEmailService emailService)

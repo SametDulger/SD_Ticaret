@@ -3,18 +3,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SDTicaret.Web</title>
+    <title>@ViewData["Title"] - SDTicaret</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SDTicaret.Web.styles.css" asp-append-version="true" />
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="alternate icon" href="~/favicon.ico" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SDTicaret.Web</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-cart3 me-2"></i>SDTicaret
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,59 +26,63 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door me-1"></i>Ana Sayfa
+                            </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Ürün Yönetimi
+                                <i class="bi bi-box me-1"></i>ÃœrÃ¼n YÃ¶netimi
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="productsDropdown">
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Ürünler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Kategoriler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Suppliers" asp-action="Index">Tedarikçiler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Stocks" asp-action="Index">Stoklar</a></li>
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index"><i class="bi bi-box-seam me-2"></i>ÃœrÃ¼nler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index"><i class="bi bi-tags me-2"></i>Kategoriler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Suppliers" asp-action="Index"><i class="bi bi-truck me-2"></i>TedarikÃ§iler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Stocks" asp-action="Index"><i class="bi bi-boxes me-2"></i>Stoklar</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Satýþ Yönetimi
+                                <i class="bi bi-cart me-1"></i>SatÄ±ÅŸ YÃ¶netimi
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="salesDropdown">
-                                <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index">Sipariþler</a></li>
-                                <li><a class="dropdown-item" asp-controller="OrderItems" asp-action="Index">Sipariþ Detaylarý</a></li>
-                                <li><a class="dropdown-item" asp-controller="Payments" asp-action="Index">Ödemeler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index"><i class="bi bi-receipt me-2"></i>SipariÅŸler</a></li>
+                                <li><a class="dropdown-item" asp-controller="OrderItems" asp-action="Index"><i class="bi bi-list-ul me-2"></i>SipariÅŸ DetaylarÄ±</a></li>
+                                <li><a class="dropdown-item" asp-controller="Payments" asp-action="Index"><i class="bi bi-credit-card me-2"></i>Ã–demeler</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Kiþi Yönetimi
+                                <i class="bi bi-people me-1"></i>KiÅŸi YÃ¶netimi
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="peopleDropdown">
-                                <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index">Müþteriler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Çalýþanlar</a></li>
+                                <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index"><i class="bi bi-person me-2"></i>MÃ¼ÅŸteriler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index"><i class="bi bi-person-badge me-2"></i>Ã‡alÄ±ÅŸanlar</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="businessDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Ýþ Yönetimi
+                                <i class="bi bi-building me-1"></i>Ä°ÅŸ YÃ¶netimi
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="businessDropdown">
-                                <li><a class="dropdown-item" asp-controller="Branches" asp-action="Index">Þubeler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Contracts" asp-action="Index">Sözleþmeler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Campaigns" asp-action="Index">Kampanyalar</a></li>
+                                <li><a class="dropdown-item" asp-controller="Branches" asp-action="Index"><i class="bi bi-geo-alt me-2"></i>Åžubeler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Contracts" asp-action="Index"><i class="bi bi-file-text me-2"></i>SÃ¶zleÅŸmeler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Campaigns" asp-action="Index"><i class="bi bi-megaphone me-2"></i>Kampanyalar</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="feedbackDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Geri Bildirim
+                                <i class="bi bi-chat-dots me-1"></i>Geri Bildirim
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="feedbackDropdown">
-                                <li><a class="dropdown-item" asp-controller="Complaints" asp-action="Index">Þikayetler</a></li>
-                                <li><a class="dropdown-item" asp-controller="Surveys" asp-action="Index">Anketler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Complaints" asp-action="Index"><i class="bi bi-exclamation-triangle me-2"></i>Åžikayetler</a></li>
+                                <li><a class="dropdown-item" asp-controller="Surveys" asp-action="Index"><i class="bi bi-clipboard-data me-2"></i>Anketler</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-check me-1"></i>Gizlilik
+                            </a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
@@ -85,24 +93,28 @@
                                     <i class="bi bi-person-circle"></i> @Context.Session.GetString("Username")
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Profile">Profil</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="ChangePassword">Þifre Deðiþtir</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Profile"><i class="bi bi-person me-2"></i>Profil</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="ChangePassword"><i class="bi bi-key me-2"></i>Åžifre DeÄŸiÅŸtir</a></li>
                                     @if (Context.Session.GetString("Role") == "Admin")
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Auth" asp-action="Users">Kullanýcý Yönetimi</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Auth" asp-action="Users"><i class="bi bi-people-fill me-2"></i>KullanÄ±cÄ± YÃ¶netimi</a></li>
                                     }
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout">Çýkýþ Yap</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout"><i class="bi bi-box-arrow-right me-2"></i>Ã‡Ä±kÄ±ÅŸ Yap</a></li>
                                 </ul>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Giriþ Yap</a>
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>GiriÅŸ Yap
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Kayýt Ol</a>
+                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">
+                                    <i class="bi bi-person-plus me-1"></i>KayÄ±t Ol
+                                </a>
                             </li>
                         }
                     </ul>
@@ -116,9 +128,18 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
-            &copy; 2024 - SDTicaret.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; @DateTime.Now.Year - SDTicaret - TÃ¼m haklarÄ± saklÄ±dÄ±r.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-white text-decoration-none">
+                        <i class="bi bi-shield-check me-1"></i>Gizlilik PolitikasÄ±
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

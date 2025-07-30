@@ -4,6 +4,7 @@
 - .NET 9.0 SDK
 - SQL Server (Express, LocalDB veya Full)
 - Visual Studio 2022 veya VS Code
+- Docker (opsiyonel)
 
 ## Kurulum Adımları
 
@@ -17,21 +18,19 @@ cd SD_Ticaret
 
 #### API Projesi için:
 1. `SDTicaret.API/appsettings.example.json` dosyasını `appsettings.json` olarak kopyalayın
-2. Connection string'i kendi veritabanı ayarlarınıza göre güncelleyin:
+2. Connection string'i güncelleyin:
    ```json
    "ConnectionStrings": {
      "DefaultConnection": "Server=YOUR_SERVER;Database=YOUR_DATABASE;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true"
    }
    ```
 
-3. Development ortamı için `appsettings.Development.example.json` dosyasını `appsettings.Development.json` olarak kopyalayın
-
 #### Web Projesi için:
 1. `SDTicaret.Web/appsettings.example.json` dosyasını `appsettings.json` olarak kopyalayın
-2. API URL'ini güncelleyin (gerekirse):
+2. API URL'ini güncelleyin:
    ```json
    "ApiSettings": {
-     "BaseUrl": "http://localhost:5080/api/"
+     "BaseUrl": "http://localhost:7244/api/"
    }
    ```
 
@@ -45,37 +44,51 @@ cd SD_Ticaret
 
 ### 4. Veritabanını Oluşturun
 ```bash
-# API projesi dizininde
 cd SDTicaret.API
 dotnet ef database update
 ```
 
 ### 5. Projeyi Çalıştırın
+
+#### Manuel Çalıştırma:
 ```bash
 # API projesini çalıştırın
 cd SDTicaret.API
 dotnet run
 
 # Yeni terminal açın ve Web projesini çalıştırın
-cd SDTicaret.Web
+cd ../SDTicaret.Web
 dotnet run
 ```
 
+#### Docker ile Çalıştırma:
+```bash
+docker-compose up -d
+```
+
+## Erişim URL'leri
+
+- **Web Uygulaması**: `https://localhost:5244`
+- **API**: `https://localhost:7244`
+- **Swagger UI**: `https://localhost:7244/swagger`
+
 ## Önemli Notlar
 
-- **Migration dosyaları** otomatik olarak oluşturulacaktır
+- **Migration dosyaları** Git tarafından ignore edilir
 - **Log dosyaları** `Logs/` klasöründe tutulacaktır
 - **Hassas bilgiler** (connection string, JWT secret) asla GitHub'a yüklenmemelidir
-- Development ortamında debug logları aktif olacaktır
 
 ## Sorun Giderme
 
 ### Veritabanı Bağlantı Hatası
 - SQL Server'ın çalıştığından emin olun
 - Connection string'deki server adını kontrol edin
-- Windows Authentication kullanıyorsanız gerekli izinlerin olduğundan emin olun
 
 ### Migration Hatası
 - Veritabanının mevcut olduğundan emin olun
 - `dotnet ef migrations add InitialCreate` komutunu çalıştırın
-- Sonra `dotnet ef database update` komutunu çalıştırın 
+- Sonra `dotnet ef database update` komutunu çalıştırın
+
+### Docker Sorunları
+- Docker Desktop'ın çalıştığından emin olun
+- Port çakışması varsa `docker-compose.yml` dosyasındaki portları değiştirin 

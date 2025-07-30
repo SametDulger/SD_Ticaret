@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - sdticaret-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  # SDTicaret API
+  sdticaret-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=SDTicaretDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - Jwt__Secret=your-super-secret-key-with-at-least-32-characters-for-jwt-signing
+      - Jwt__Issuer=SDTicaretAPI
+      - Jwt__Audience=SDTicaretClient
+      - Jwt__ExpiryInHours=1
+    ports:
+      - "5080:80"
+      - "5443:443"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - sdticaret-network
+    volumes:
+      - ./Logs:/app/Logs
+    restart: unless-stopped
+
+  # SDTicaret Web (Optional - if you want to containerize the web app too)
+  # sdticaret-web:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.web
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Production
+  #     - ApiSettings__BaseUrl=http://sdticaret-api/api/
+  #   ports:
+  #     - "5081:80"
+  #     - "5444:443"
+  #   depends_on:
+  #     - sdticaret-api
+  #   networks:
+  #     - sdticaret-network
+  #   restart: unless-stopped
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  sdticaret-network:
+    driver: bridge 
