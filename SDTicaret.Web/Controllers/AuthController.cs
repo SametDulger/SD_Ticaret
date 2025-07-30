@@ -271,6 +271,59 @@ public class AuthController : Controller
         }
     }
 
+    [HttpGet("reset-password")]
+    public IActionResult ResetPassword([FromQuery] string token)
+    {
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["ErrorMessage"] = "Geçersiz token";
+            return RedirectToAction(nameof(Login));
+        }
+
+        var resetPasswordDto = new ResetPasswordDto { Token = token };
+        return View(resetPasswordDto);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+    {
+        if (!ModelState.IsValid)
+            return View(resetPasswordDto);
+
+        try
+        {
+            var json = JsonSerializer.Serialize(resetPasswordDto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("api/auth/reset-password", content);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            var errorResponse = JsonSerializer.Deserialize<JsonElement>(errorContent);
+            
+            if (errorResponse.TryGetProperty("message", out var message))
+            {
+                ModelState.AddModelError("", message.GetString() ?? "Şifre sıfırlanırken bir hata oluştu");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Şifre sıfırlanırken bir hata oluştu");
+            }
+
+            return View(resetPasswordDto);
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError("", "Şifre sıfırlanırken bir hata oluştu");
+            return View(resetPasswordDto);
+        }
+    }
+
     [HttpGet("users")]
     public async Task<IActionResult> Users()
     {

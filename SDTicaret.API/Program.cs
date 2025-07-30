@@ -134,7 +134,9 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 
 // Request/Response logging middleware
-builder.Services.AddSingleton<RequestResponseLoggingMiddleware>();
+
+// Mock Email Service
+builder.Services.AddScoped<IEmailService, MockEmailService>();
 
 var app = builder.Build();
 
