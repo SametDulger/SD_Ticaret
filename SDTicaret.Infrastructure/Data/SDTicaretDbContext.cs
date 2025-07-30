@@ -15,6 +15,8 @@ public class SDTicaretDbContext : DbContext
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Branch> Branches { get; set; }
     public DbSet<Stock> Stocks { get; set; }
+    public DbSet<StockMovement> StockMovements { get; set; }
+    public DbSet<StockNotification> StockNotifications { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Order> Orders { get; set; }
