@@ -1,4 +1,5 @@
 # Use the official .NET 9 runtime image as the base image
+# This Dockerfile is for the SDTicaret API project
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
