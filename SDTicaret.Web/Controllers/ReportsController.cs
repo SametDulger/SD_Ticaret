@@ -7,13 +7,10 @@ namespace SDTicaret.Web.Controllers;
 public class ReportsController : Controller
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
 
-    public ReportsController(IConfiguration configuration)
+    public ReportsController(IHttpClientFactory httpClientFactory)
     {
-        _configuration = configuration;
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri(_configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5080/api/");
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
     }
 
     [HttpGet]
@@ -48,7 +45,8 @@ public class ReportsController : Controller
         return View(new DashboardStatsDto());
     }
 
-    [HttpGet("sales")]
+    [HttpGet]
+    [Route("Reports/Sales")]
     public async Task<IActionResult> Sales(DateTime? startDate = null, DateTime? endDate = null)
     {
         var token = HttpContext.Session.GetString("AccessToken");
@@ -83,7 +81,8 @@ public class ReportsController : Controller
         return View(new SalesReportDto());
     }
 
-    [HttpGet("inventory")]
+    [HttpGet]
+    [Route("Reports/Inventory")]
     public async Task<IActionResult> Inventory()
     {
         var token = HttpContext.Session.GetString("AccessToken");
@@ -115,7 +114,8 @@ public class ReportsController : Controller
         return View(new InventoryReportDto());
     }
 
-    [HttpGet("customers")]
+    [HttpGet]
+    [Route("Reports/Customers")]
     public async Task<IActionResult> Customers()
     {
         var token = HttpContext.Session.GetString("AccessToken");

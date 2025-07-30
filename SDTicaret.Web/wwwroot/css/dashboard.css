@@ -1,0 +1,47 @@
+/* Dashboard Page Specific Styles */
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-indicator.success {
+    background-color: var(--success-color);
+}
+
+.status-indicator.warning {
+    background-color: var(--warning-color);
+}
+
+.status-indicator.danger {
+    background-color: var(--danger-color);
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hover-bg-light:hover {
+    background-color: var(--gray-100);
+    transition: background-color var(--transition-fast);
+}
+
+.activity-item {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.activity-item:hover {
+    background-color: var(--gray-50);
+} 

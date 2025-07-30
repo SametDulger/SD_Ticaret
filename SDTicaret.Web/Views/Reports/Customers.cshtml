@@ -1,0 +1,275 @@
+@model SDTicaret.Web.Models.CustomerReportDto
+@{
+    ViewData["Title"] = "Müşteri Raporu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-people text-primary me-2"></i>
+                    Müşteri Raporu
+                </h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="exportToPDF()">
+                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Özet Kartları -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Toplam Müşteri
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCustomers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-people fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Aktif Müşteri
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActiveCustomers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-person-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Yeni Müşteri (Bu Ay)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.NewCustomersThisMonth</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-person-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Ortalama Sipariş Değeri
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.AverageCustomerValue.ToString("C")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-currency-dollar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Müşteri Listesi -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Müşteri Listesi
+                    </h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">İşlemler:</div>
+                            <a class="dropdown-item" href="#" onclick="refreshData()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Yenile
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="exportToCSV()">
+                                <i class="bi bi-file-text me-2"></i>CSV İndir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.CustomerActivity != null && Model.CustomerActivity.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="customersTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Müşteri ID</th>
+                                        <th>Ad Soyad</th>
+                                        <th>Email</th>
+                                        <th>Kayıt Tarihi</th>
+                                        <th>Toplam Sipariş</th>
+                                        <th>Toplam Harcama</th>
+                                        <th>Son Sipariş</th>
+                                        <th>Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var customer in Model.CustomerActivity)
+                                    {
+                                        <tr>
+                                            <td>@customer.CustomerId</td>
+                                            <td>@customer.CustomerName</td>
+                                            <td>@customer.Email</td>
+                                            <td>@customer.RegistrationDate.ToString("dd.MM.yyyy")</td>
+                                            <td>@customer.TotalOrders</td>
+                                            <td>@customer.TotalSpent.ToString("C")</td>
+                                            <td>@customer.LastOrderDate.ToString("dd.MM.yyyy")</td>
+                                            <td>
+                                                @if (customer.ActivityStatus == "Active")
+                                                {
+                                                    <span class="badge bg-success">Aktif</span>
+                                                }
+                                                else if (customer.ActivityStatus == "New")
+                                                {
+                                                    <span class="badge bg-info">Yeni</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Pasif</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-people display-1 text-muted"></i>
+                            <p class="lead text-muted mt-3">Henüz müşteri verisi bulunmuyor.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Müşteri Segmentasyonu -->
+    @if (Model.CustomerSegments != null && Model.CustomerSegments.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-pie-chart me-2"></i>
+                            Müşteri Segmentasyonu
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                                                                @foreach (var segment in Model.CustomerSegments)
+                                    {
+                                        <div class="col-md-3 mb-3">
+                                            <div class="card border-left-primary">
+                                                <div class="card-body">
+                                                    <div class="row no-gutters align-items-center">
+                                                        <div class="col mr-2">
+                                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                                @segment.Segment
+                                                            </div>
+                                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                                @segment.CustomerCount
+                                                            </div>
+                                                            <div class="text-xs text-muted">
+                                                                %@segment.Percentage.ToString("F1")
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <i class="bi bi-people fa-2x text-gray-300"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function exportToPDF() {
+            // PDF export işlemi
+            alert('PDF export özelliği yakında eklenecek.');
+        }
+
+        function exportToExcel() {
+            // Excel export işlemi
+            alert('Excel export özelliği yakında eklenecek.');
+        }
+
+        function exportToCSV() {
+            // CSV export işlemi
+            alert('CSV export özelliği yakında eklenecek.');
+        }
+
+        function refreshData() {
+            location.reload();
+        }
+
+        // DataTable initialization
+        $(document).ready(function() {
+            $('#customersTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[4, 'desc']] // Toplam siparişe göre sırala
+            });
+        });
+    </script>
+} 

@@ -9,4 +9,7 @@ public class ContractDto
     public int CustomerId { get; set; }
     public int SupplierId { get; set; }
     public string? ContractType { get; set; }
+    public decimal TotalValue { get; set; }
+    public string Status { get; set; } = "Active";
+    public bool IsActive { get; set; } = true;
 } 

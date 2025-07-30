@@ -4,61 +4,184 @@
     ViewData["Title"] = "Çalışanlar";
 }
 
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3">Çalışanlar</h1>
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Yeni Çalışan
-                </a>
-            </div>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">
+                <i class="bi bi-people me-2"></i>Çalışanlar
+            </h3>
+            <p class="text-muted mb-0">Sistemdeki tüm çalışanları yönetin</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Yeni Çalışan
+        </a>
+    </div>
 
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Ad</th>
-                                    <th>Soyad</th>
-                                    <th>E-posta</th>
-                                    <th>Telefon</th>
-                                    <th>Pozisyon</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>@item.Id</td>
-                                        <td>@item.FirstName</td>
-                                        <td>@item.LastName</td>
-                                        <td>@item.Email</td>
-                                        <td>@item.Phone</td>
-                                        <td>@item.Position</td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-2">
+                        <i class="bi bi-people-fill fs-1"></i>
                     </div>
+                    <h4 class="mb-1">@Model.Count()</h4>
+                    <p class="text-muted mb-0">Toplam Çalışan</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-2">
+                        <i class="bi bi-person-check-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count(e => e.IsActive)</h4>
+                    <p class="text-muted mb-0">Aktif Çalışan</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2">
+                        <i class="bi bi-person-badge-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Select(e => e.Position).Distinct().Count()</h4>
+                    <p class="text-muted mb-0">Farklı Pozisyon</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-2">
+                        <i class="bi bi-calendar-check-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count(e => e.HireDate.Year == DateTime.Now.Year)</h4>
+                    <p class="text-muted mb-0">Bu Yıl İşe Alınan</p>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+
+    <!-- Search and Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Çalışan ara...">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">ID</th>
+                            <th class="border-0">Ad Soyad</th>
+                            <th class="border-0">E-posta</th>
+                            <th class="border-0">Telefon</th>
+                            <th class="border-0">Pozisyon</th>
+                            <th class="border-0">Durum</th>
+                            <th class="border-0 text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="align-middle">@item.Id</td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">@item.FirstName @item.LastName</div>
+                                            <small class="text-muted">@item.EmployeeNumber</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">@item.Email</td>
+                                <td class="align-middle">@item.Phone</td>
+                                <td class="align-middle">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">@item.Position</span>
+                                </td>
+                                <td class="align-middle">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pasif</span>
+                                    }
+                                </td>
+                                <td class="align-middle text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Detaylar">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning" title="Düzenle">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.75rem;
+    }
+    .btn-group .btn {
+        border-radius: 0.375rem !important;
+    }
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.375rem !important;
+        border-bottom-left-radius: 0.375rem !important;
+    }
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.375rem !important;
+        border-bottom-right-radius: 0.375rem !important;
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script> 

@@ -7,6 +7,7 @@ public class Complaint : BaseEntity
     public string Subject { get; set; } = null!;
     public string Description { get; set; } = null!;
     public string Status { get; set; } = "Open";
+    public string Priority { get; set; } = "Medium";
     public DateTime CreatedDate { get; set; }
     public DateTime? ResolvedDate { get; set; }
 } 

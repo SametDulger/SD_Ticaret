@@ -7,13 +7,10 @@ namespace SDTicaret.Web.Controllers;
 public class DashboardController : Controller
 {
     private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
 
-    public DashboardController(IConfiguration configuration)
+    public DashboardController(IHttpClientFactory httpClientFactory)
     {
-        _configuration = configuration;
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri(_configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5080/api/");
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
     }
 
     [HttpGet]
@@ -28,17 +25,52 @@ public class DashboardController : Controller
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             
             // Dashboard verilerini API'den al
-            var response = await _httpClient.GetAsync("api/dashboard/stats");
+            var response = await _httpClient.GetAsync("dashboard/stats");
             
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var dashboardData = JsonSerializer.Deserialize<DashboardViewModel>(responseContent, new JsonSerializerOptions
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<DashboardStatsDto>>(responseContent, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                return View(dashboardData);
+                if (apiResponse?.Success == true && apiResponse.Data != null)
+                {
+                    var dashboardViewModel = new DashboardViewModel
+                    {
+                        TotalUsers = apiResponse.Data.TotalUsers,
+                        TotalProducts = apiResponse.Data.TotalProducts,
+                        TotalOrders = apiResponse.Data.TotalOrders,
+                        TotalRevenue = apiResponse.Data.TotalRevenue,
+                        PendingOrders = apiResponse.Data.PendingOrders,
+                        ProcessingOrders = apiResponse.Data.ProcessingOrders,
+                        ShippedOrders = apiResponse.Data.ShippedOrders,
+                        DeliveredOrders = apiResponse.Data.DeliveredOrders,
+                        LowStockProducts = apiResponse.Data.LowStockProducts,
+                        OutOfStockProducts = apiResponse.Data.OutOfStockProducts,
+                        MonthlyRevenue = apiResponse.Data.MonthlyRevenue,
+                        WeeklyRevenue = apiResponse.Data.WeeklyRevenue,
+                        DailyRevenue = apiResponse.Data.DailyRevenue,
+                        RecentOrders = apiResponse.Data.RecentOrders?.Select(o => new OrderDto
+                        {
+                            Id = o.Id,
+                            CustomerId = 0, // RecentOrderDto'da CustomerId yok
+                            OrderDate = o.OrderDate,
+                            TotalAmount = o.TotalAmount,
+                            OrderStatus = o.Status // RecentOrderDto'da Status var, OrderStatus değil
+                        }).ToList() ?? new List<OrderDto>(),
+                        TopProducts = apiResponse.Data.TopProducts?.Select(p => new ProductDto
+                        {
+                            Id = p.Id,
+                            Name = p.Name,
+                            Price = p.Price,
+                            CategoryName = p.CategoryName
+                        }).ToList() ?? new List<ProductDto>()
+                    };
+
+                    return View(dashboardViewModel);
+                }
             }
         }
         catch (Exception)
@@ -72,7 +104,7 @@ public class DashboardController : Controller
         try
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.GetAsync("api/dashboard/analytics");
+            var response = await _httpClient.GetAsync("dashboard/analytics");
             
             if (response.IsSuccessStatusCode)
             {

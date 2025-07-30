@@ -25,15 +25,23 @@ public class AuthController : ControllerBase
     {
         try
         {
+            Console.WriteLine($"Login attempt for user: {loginDto?.Username}");
+            Console.WriteLine($"Password length: {loginDto?.Password?.Length}");
+            
             var result = await _authService.LoginAsync(loginDto);
+            Console.WriteLine($"Login successful for user: {result.Username}");
+            
             return Ok(ApiResponse<TokenDto>.SuccessResult(result, "Giriş başarılı"));
         }
         catch (UnauthorizedAccessException ex)
         {
+            Console.WriteLine($"Login failed - Unauthorized: {ex.Message}");
             return Unauthorized(ApiResponse<TokenDto>.ErrorResult(ex.Message));
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Login failed - Exception: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return BadRequest(ApiResponse<TokenDto>.ErrorResult(ex.Message));
         }
     }

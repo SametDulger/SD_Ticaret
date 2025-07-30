@@ -1,0 +1,340 @@
+@model SDTicaret.Web.Models.InventoryReportDto
+@{
+    ViewData["Title"] = "Envanter Raporu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-boxes text-primary me-2"></i>
+                    Envanter Raporu
+                </h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="exportToPDF()">
+                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="exportToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Özet Kartları -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Toplam Ürün
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Stokta Olan
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model.TotalProducts - Model.OutOfStockProducts)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Düşük Stok
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.LowStockProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Stok Dışı
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.OutOfStockProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-x-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stok Durumu -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Stok Durumu
+                    </h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">İşlemler:</div>
+                            <a class="dropdown-item" href="#" onclick="refreshData()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Yenile
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="exportToCSV()">
+                                <i class="bi bi-file-text me-2"></i>CSV İndir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.LowStockItems != null && Model.LowStockItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="stockTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Ürün ID</th>
+                                        <th>Ürün Adı</th>
+                                        <th>Kategori</th>
+                                        <th>Mevcut Stok</th>
+                                        <th>Minimum Stok</th>
+                                        <th>Maksimum Stok</th>
+                                        <th>Stok Durumu</th>
+                                        <th>Son Giriş</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.LowStockItems)
+                                    {
+                                        <tr>
+                                            <td>@item.ProductId</td>
+                                            <td>@item.ProductName</td>
+                                            <td>@item.CategoryName</td>
+                                            <td>@item.CurrentStock</td>
+                                            <td>@item.MinimumStock</td>
+                                            <td>@item.MaximumStock</td>
+                                            <td>
+                                                @if (item.CurrentStock == 0)
+                                                {
+                                                    <span class="badge bg-danger">Stok Dışı</span>
+                                                }
+                                                else if (item.CurrentStock <= item.MinimumStock)
+                                                {
+                                                    <span class="badge bg-warning">Düşük Stok</span>
+                                                }
+                                                else if (item.CurrentStock >= item.MaximumStock)
+                                                {
+                                                    <span class="badge bg-info">Yüksek Stok</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Normal</span>
+                                                }
+                                            </td>
+                                            <td>@item.LastStockIn.ToString("dd.MM.yyyy HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-boxes display-1 text-muted"></i>
+                            <p class="lead text-muted mt-3">Henüz stok verisi bulunmuyor.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stok Hareketleri -->
+    @if (Model.RecentMovements != null && Model.RecentMovements.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-arrow-left-right me-2"></i>
+                            Son Stok Hareketleri
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="movementsTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Ürün</th>
+                                        <th>Hareket Tipi</th>
+                                        <th>Miktar</th>
+                                        <th>Önceki Stok</th>
+                                        <th>Yeni Stok</th>
+                                        <th>Açıklama</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var movement in Model.RecentMovements)
+                                    {
+                                        <tr>
+                                                                                         <td>@movement.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                             <td>@movement.ProductName</td>
+                                             <td>
+                                                 @if (movement.MovementType == "IN")
+                                                 {
+                                                     <span class="badge bg-success">Giriş</span>
+                                                 }
+                                                 else
+                                                 {
+                                                     <span class="badge bg-danger">Çıkış</span>
+                                                 }
+                                             </td>
+                                             <td>@movement.Quantity</td>
+                                             <td>@movement.PreviousQuantity</td>
+                                             <td>@movement.NewQuantity</td>
+                                             <td>@movement.Reason</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Kategori Bazında Stok -->
+    @if (Model.CategoryInventory != null && Model.CategoryInventory.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-pie-chart me-2"></i>
+                            Kategori Bazında Stok Durumu
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var category in Model.CategoryInventory)
+                            {
+                                <div class="col-md-3 mb-3">
+                                    <div class="card border-left-primary">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        @category.CategoryName
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                        @category.TotalProducts
+                                                    </div>
+                                                    <div class="text-xs text-muted">
+                                                        Stokta: @(category.TotalProducts - category.OutOfStockProducts)
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="bi bi-box fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function exportToPDF() {
+            alert('PDF export özelliği yakında eklenecek.');
+        }
+
+        function exportToExcel() {
+            alert('Excel export özelliği yakında eklenecek.');
+        }
+
+        function exportToCSV() {
+            alert('CSV export özelliği yakında eklenecek.');
+        }
+
+        function refreshData() {
+            location.reload();
+        }
+
+        $(document).ready(function() {
+            $('#stockTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[3, 'asc']] // Stok miktarına göre sırala
+            });
+
+            $('#movementsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[0, 'desc']] // Tarihe göre sırala
+            });
+        });
+    </script>
+} 

@@ -80,16 +80,20 @@ public class ReportingService : IReportingService
         return stats;
     }
 
-    public async Task<SalesReportDto> GetSalesReportAsync(DateTime startDate, DateTime endDate)
+    public async Task<SalesReportDto> GetSalesReportAsync(DateTime? startDate = null, DateTime? endDate = null)
     {
+        var now = DateTime.UtcNow;
+        var actualStartDate = startDate ?? now.AddDays(-30);
+        var actualEndDate = endDate ?? now;
+
         var report = new SalesReportDto
         {
-            StartDate = startDate,
-            EndDate = endDate
+            StartDate = actualStartDate,
+            EndDate = actualEndDate
         };
 
         var orders = await _unitOfWork.Repository<Order>().GetAllAsync(o => 
-            o.OrderDate >= startDate && o.OrderDate <= endDate && o.OrderStatus != "Cancelled");
+            o.OrderDate >= actualStartDate && o.OrderDate <= actualEndDate && o.OrderStatus != "Cancelled");
 
         report.TotalSales = orders.Sum(o => o.TotalAmount);
         report.TotalOrders = orders.Count();
@@ -97,10 +101,10 @@ public class ReportingService : IReportingService
         report.AverageOrderValue = report.TotalOrders > 0 ? report.TotalSales / report.TotalOrders : 0;
 
         // Günlük satışlar
-        report.DailySales = await GetDailySalesAsync(startDate, endDate);
+        report.DailySales = await GetDailySalesAsync(actualStartDate, actualEndDate);
 
         // Kategori satışları
-        report.CategorySales = await GetCategorySalesAsync(startDate, endDate);
+        report.CategorySales = await GetCategorySalesAsync(actualStartDate, actualEndDate);
 
         // En iyi ürünler
         var topProducts = await GetTopProductsAsync(20);
@@ -753,5 +757,31 @@ public class ReportingService : IReportingService
         }
 
         return lifetimeValues.OrderByDescending(x => x.LifetimeValue).Take(50).ToList();
+    }
+
+    public async Task<List<OrderDto>> GetRecentOrdersAsync(int count = 5)
+    {
+        var orders = await _unitOfWork.Repository<Order>().GetAllAsync();
+        var recentOrders = orders
+            .OrderByDescending(o => o.OrderDate)
+            .Take(count)
+            .ToList();
+
+        return _mapper.Map<List<OrderDto>>(recentOrders);
+    }
+
+    public async Task<List<ProductDto>> GetLowStockProductsAsync(int count = 10)
+    {
+        var stocks = await _unitOfWork.Repository<Stock>().GetAllAsync();
+        var lowStockStocks = stocks
+            .Where(s => s.Quantity <= s.MinimumStock && s.Quantity > 0)
+            .OrderBy(s => s.Quantity)
+            .Take(count)
+            .ToList();
+
+        var productIds = lowStockStocks.Select(s => s.ProductId).ToList();
+        var products = await _unitOfWork.Repository<Product>().GetAllAsync(p => productIds.Contains(p.Id));
+
+        return _mapper.Map<List<ProductDto>>(products);
     }
 } 
