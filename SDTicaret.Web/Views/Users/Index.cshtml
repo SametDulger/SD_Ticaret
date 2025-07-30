@@ -4,72 +4,270 @@
     ViewData["Title"] = "Kullanıcılar";
 }
 
-<h1>Kullanıcılar</h1>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-people me-2"></i>
+                Kullanıcılar
+            </h1>
+            <p class="text-muted mb-0">@Model.Count() kullanıcı bulundu</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="input-group" style="max-width: 250px;">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Kullanıcı ara...">
+            </div>
+            <a href="@Url.Action("Create", "Users")" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus me-1"></i>
+                Yeni Kullanıcı
+            </a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Yeni Kullanıcı Ekle</a>
-</p>
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Toplam Kullanıcı</h6>
+                            <h4 class="mb-0">@Model.Count()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.First().Username)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
-            <th>@Html.DisplayNameFor(model => model.First().FirstName)</th>
-            <th>@Html.DisplayNameFor(model => model.First().LastName)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Role)</th>
-            <th>@Html.DisplayNameFor(model => model.First().IsActive)</th>
-            <th>@Html.DisplayNameFor(model => model.First().EmailConfirmed)</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Username)</td>
-                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
-                <td>@Html.DisplayFor(modelItem => item.LastName)</td>
-                <td>@Html.DisplayFor(modelItem => item.Role)</td>
-                <td>
-                    @if (item.IsActive)
-                    {
-                        <span class="badge bg-success">Aktif</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Pasif</span>
-                    }
-                </td>
-                <td>
-                    @if (item.EmailConfirmed)
-                    {
-                        <span class="badge bg-success">Onaylı</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning">Onaylanmamış</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
-                    @if (item.IsActive)
-                    {
-                        <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display: inline;">
-                            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Kullanıcıyı deaktifleştirmek istediğinizden emin misiniz?')">Deaktifleştir</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form asp-action="Activate" asp-route-id="@item.Id" method="post" style="display: inline;">
-                            <button type="submit" class="btn btn-success btn-sm">Aktifleştir</button>
-                        </form>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table> 
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Aktif Kullanıcı</h6>
+                            <h4 class="mb-0">@Model.Count(u => u.IsActive)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-envelope-check"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">E-posta Onaylı</h6>
+                            <h4 class="mb-0">@Model.Count(u => u.EmailConfirmed)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Admin Kullanıcı</h6>
+                            <h4 class="mb-0">@Model.Count(u => u.Role == "Admin")</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list me-2"></i>
+                Kullanıcı Listesi
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">Kullanıcı</th>
+                                <th class="border-0">İletişim</th>
+                                <th class="border-0">Rol</th>
+                                <th class="border-0">Durum</th>
+                                <th class="border-0">E-posta</th>
+                                <th class="border-0 text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar bg-light rounded me-3">
+                                                <i class="bi bi-person text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 small">@user.FirstName @user.LastName</h6>
+                                                <small class="text-muted">@user.Username</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small">@user.Email</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@(user.Role == "Admin" ? "danger" : user.Role == "Manager" ? "warning" : "secondary")">
+                                            @user.Role
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@(user.IsActive ? "success" : "danger")">
+                                            @(user.IsActive ? "Aktif" : "Pasif")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@(user.EmailConfirmed ? "success" : "warning")">
+                                            @(user.EmailConfirmed ? "Onaylı" : "Onaylanmamış")
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="@Url.Action("Details", "Users", new { id = user.Id })" 
+                                               class="btn btn-outline-primary" title="Detay">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="@Url.Action("Edit", "Users", new { id = user.Id })" 
+                                               class="btn btn-outline-success" title="Düzenle">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="@Url.Action("Delete", "Users", new { id = user.Id })" 
+                                               class="btn btn-outline-danger" title="Sil"
+                                               onclick="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                            @if (user.IsActive)
+                                            {
+                                                <form asp-action="Deactivate" asp-route-id="@user.Id" method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-outline-secondary" title="Deaktifleştir"
+                                                            onclick="return confirm('Kullanıcıyı deaktifleştirmek istediğinizden emin misiniz?')">
+                                                        <i class="bi bi-person-x"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Activate" asp-route-id="@user.Id" method="post" style="display: inline;">
+                                                    <button type="submit" class="btn btn-outline-success" title="Aktifleştir">
+                                                        <i class="bi bi-person-check"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+                    <p class="text-muted mt-2">Henüz kullanıcı bulunmuyor</p>
+                    <a href="@Url.Action("Create", "Users")" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus me-1"></i>
+                        İlk Kullanıcıyı Ekle
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const userName = row.querySelector('h6').textContent.toLowerCase();
+            const username = row.querySelector('small').textContent.toLowerCase();
+            const email = row.querySelector('.small').textContent.toLowerCase();
+            
+            if (userName.includes(searchTerm) || username.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script> 

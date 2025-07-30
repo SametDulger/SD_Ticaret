@@ -4,36 +4,254 @@
     ViewData["Title"] = "Müşteriler";
 }
 
-<h1>Müşteriler</h1>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-people me-2"></i>
+                Müşteriler
+            </h1>
+            <p class="text-muted mb-0">@Model.Count() müşteri bulundu</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="input-group" style="max-width: 250px;">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Müşteri ara...">
+            </div>
+            <a href="@Url.Action("Create", "Customers")" class="btn btn-primary">
+                <i class="bi bi-plus me-1"></i>
+                Yeni Müşteri
+            </a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Yeni Müşteri</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Ad</th>
-            <th>Soyad</th>
-            <th>E-posta</th>
-            <th>Telefon</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@item.Id</td>
-            <td>@item.FirstName</td>
-            <td>@item.LastName</td>
-            <td>@item.Email</td>
-            <td>@item.Phone</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a> |
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detay</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table> 
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Toplam Müşteri</h6>
+                            <h4 class="mb-0">@Model.Count()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Aktif Müşteri</h6>
+                            <h4 class="mb-0">@Model.Count(c => c.IsActive)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-cart"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Sipariş Veren</h6>
+                            <h4 class="mb-0">@Model.Count(c => c.TotalOrders > 0)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Ortalama Sipariş</h6>
+                            <h4 class="mb-0">@(Model.Any() ? Model.Average(c => c.TotalOrders).ToString("F1") : "0")</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list me-2"></i>
+                Müşteri Listesi
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">Müşteri</th>
+                                <th class="border-0">İletişim</th>
+                                <th class="border-0">Adres</th>
+                                <th class="border-0">Sipariş</th>
+                                <th class="border-0">Durum</th>
+                                <th class="border-0 text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var customer in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="customer-avatar bg-light rounded me-3">
+                                                <i class="bi bi-person text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 small">@customer.FirstName @customer.LastName</h6>
+                                                <small class="text-muted">ID: @customer.Id</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div class="small">@customer.Email</div>
+                                            <small class="text-muted">@customer.Phone</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@customer.Address</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-secondary me-2">@customer.TotalOrders</span>
+                                            <small class="text-muted">sipariş</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@(customer.IsActive ? "success" : "secondary")">
+                                            @(customer.IsActive ? "Aktif" : "Pasif")
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group" role="group">
+                                            <a href="@Url.Action("Details", "Customers", new { id = customer.Id })" 
+                                               class="btn btn-outline-primary btn-sm" title="Detay">
+                                                <i class="bi bi-eye me-1"></i>Detay
+                                            </a>
+                                            <a href="@Url.Action("Edit", "Customers", new { id = customer.Id })" 
+                                               class="btn btn-outline-warning btn-sm" title="Düzenle">
+                                                <i class="bi bi-pencil me-1"></i>Düzenle
+                                            </a>
+                                            <a href="@Url.Action("Delete", "Customers", new { id = customer.Id })" 
+                                               class="btn btn-outline-danger btn-sm" title="Sil"
+                                               onclick="return confirm('Bu müşteriyi silmek istediğinizden emin misiniz?')">
+                                                <i class="bi bi-trash me-1"></i>Sil
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+                    <p class="text-muted mt-2">Henüz müşteri bulunmuyor</p>
+                    <a href="@Url.Action("Create", "Customers")" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus me-1"></i>
+                        İlk Müşteriyi Ekle
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const customerName = row.querySelector('h6').textContent.toLowerCase();
+            const customerEmail = row.querySelector('.small').textContent.toLowerCase();
+            
+            if (customerName.includes(searchTerm) || customerEmail.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script> 

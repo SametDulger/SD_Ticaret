@@ -4,66 +4,166 @@
     ViewData["Title"] = "Kullanıcı Yönetimi";
 }
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h3>Kullanıcı Yönetimi</h3>
-            <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                <i class="bi bi-plus-circle"></i> Yeni Kullanıcı
-            </a>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">
+                <i class="bi bi-people me-2"></i>Kullanıcı Yönetimi
+            </h3>
+            <p class="text-muted mb-0">Sistemdeki tüm kullanıcıları yönetin</p>
         </div>
-        <div class="card-body">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="bi bi-plus-circle me-2"></i>Yeni Kullanıcı
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-2">
+                        <i class="bi bi-people-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count()</h4>
+                    <p class="text-muted mb-0">Toplam Kullanıcı</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-2">
+                        <i class="bi bi-check-circle-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count(u => u.IsActive)</h4>
+                    <p class="text-muted mb-0">Aktif Kullanıcı</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-2">
+                        <i class="bi bi-envelope-check-fill fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count(u => u.EmailConfirmed)</h4>
+                    <p class="text-muted mb-0">E-posta Onaylı</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-danger mb-2">
+                        <i class="bi bi-shield-fill-check fs-1"></i>
+                    </div>
+                    <h4 class="mb-1">@Model.Count(u => u.Role == "Admin")</h4>
+                    <p class="text-muted mb-0">Admin Kullanıcı</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Kullanıcı ara...">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Kullanıcı Adı</th>
-                            <th>Ad Soyad</th>
-                            <th>E-posta</th>
-                            <th>Rol</th>
-                            <th>Durum</th>
-                            <th>Kayıt Tarihi</th>
-                            <th>İşlemler</th>
+                            <th class="border-0">ID</th>
+                            <th class="border-0">Kullanıcı</th>
+                            <th class="border-0">E-posta</th>
+                            <th class="border-0">Rol</th>
+                            <th class="border-0">Durum</th>
+                            <th class="border-0">Kayıt Tarihi</th>
+                            <th class="border-0 text-end">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var user in Model)
                         {
                             <tr>
-                                <td>@user.Id</td>
-                                <td>@user.Username</td>
-                                <td>@(user.FirstName + " " + user.LastName)</td>
-                                <td>@user.Email</td>
-                                <td>
-                                    <span class="badge @(user.Role == "Admin" ? "bg-danger" : user.Role == "Employee" ? "bg-warning" : "bg-info")">
-                                        @user.Role
-                                    </span>
+                                <td class="align-middle">@user.Id</td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">@user.Username</div>
+                                            <small class="text-muted">@(user.FirstName + " " + user.LastName)</small>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>
-                                    <span class="badge @(user.IsActive ? "bg-success" : "bg-secondary")">
-                                        @(user.IsActive ? "Aktif" : "Pasif")
-                                    </span>
+                                <td class="align-middle">
+                                    <div class="fw-semibold">@user.Email</div>
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <small class="text-success"><i class="bi bi-check-circle me-1"></i>Onaylı</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-warning"><i class="bi bi-clock me-1"></i>Bekliyor</small>
+                                    }
                                 </td>
-                                <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editUser(@user.Id)">
+                                <td class="align-middle">
+                                    @if (user.Role == "Admin")
+                                    {
+                                        <span class="badge bg-danger">Admin</span>
+                                    }
+                                    else if (user.Role == "Employee")
+                                    {
+                                        <span class="badge bg-warning">Çalışan</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Müşteri</span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pasif</span>
+                                    }
+                                </td>
+                                <td class="align-middle">@user.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                <td class="align-middle text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-primary" onclick="editUser(@user.Id)" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         @if (user.IsActive)
                                         {
-                                            <button class="btn btn-sm btn-outline-warning" onclick="deactivateUser(@user.Id)">
+                                            <button class="btn btn-outline-warning" onclick="deactivateUser(@user.Id)" title="Deaktifleştir">
                                                 <i class="bi bi-pause-circle"></i>
                                             </button>
                                         }
                                         else
                                         {
-                                            <button class="btn btn-sm btn-outline-success" onclick="activateUser(@user.Id)">
+                                            <button class="btn btn-outline-success" onclick="activateUser(@user.Id)" title="Aktifleştir">
                                                 <i class="bi bi-play-circle"></i>
                                             </button>
                                         }
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(@user.Id)">
+                                        <button class="btn btn-outline-danger" onclick="deleteUser(@user.Id)" title="Sil">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -114,7 +214,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="submit" class="btn btn-success">Kaydet</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
                 </div>
             </form>
         </div>
@@ -166,106 +266,141 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Add User
-        document.getElementById('addUserForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const userData = Object.fromEntries(formData);
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.75rem;
+    }
+    .btn-group .btn {
+        border-radius: 0.375rem !important;
+    }
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.375rem !important;
+        border-bottom-left-radius: 0.375rem !important;
+    }
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.375rem !important;
+        border-bottom-right-radius: 0.375rem !important;
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Add User
+    document.getElementById('addUserForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const userData = Object.fromEntries(formData);
+        
+        try {
+            const response = await fetch('/api/auth/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
+                },
+                body: JSON.stringify(userData)
+            });
             
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Kullanıcı eklenirken hata oluştu');
+            }
+        } catch (error) {
+            alert('Bir hata oluştu');
+        }
+    });
+
+    // Edit User
+    function editUser(userId) {
+        // Burada kullanıcı bilgilerini getirip modal'ı doldur
+        // Şimdilik basit bir örnek
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editUserModal').classList.add('show');
+    }
+
+    // Activate User
+    async function activateUser(userId) {
+        if (confirm('Kullanıcıyı aktifleştirmek istediğinizden emin misiniz?')) {
             try {
-                const response = await fetch('/api/auth/users', {
+                const response = await fetch(`/api/auth/users/${userId}/activate`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
-                    },
-                    body: JSON.stringify(userData)
+                    }
                 });
                 
                 if (response.ok) {
                     location.reload();
                 } else {
-                    alert('Kullanıcı eklenirken hata oluştu');
+                    alert('Kullanıcı aktifleştirilirken hata oluştu');
                 }
             } catch (error) {
                 alert('Bir hata oluştu');
             }
-        });
-
-        // Edit User
-        function editUser(userId) {
-            // Burada kullanıcı bilgilerini getirip modal'ı doldur
-            // Şimdilik basit bir örnek
-            document.getElementById('editUserId').value = userId;
-            document.getElementById('editUserModal').classList.add('show');
         }
+    }
 
-        // Activate User
-        async function activateUser(userId) {
-            if (confirm('Kullanıcıyı aktifleştirmek istediğinizden emin misiniz?')) {
-                try {
-                    const response = await fetch(`/api/auth/users/${userId}/activate`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Kullanıcı aktifleştirilirken hata oluştu');
+    // Deactivate User
+    async function deactivateUser(userId) {
+        if (confirm('Kullanıcıyı deaktifleştirmek istediğinizden emin misiniz?')) {
+            try {
+                const response = await fetch(`/api/auth/users/${userId}/deactivate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
                     }
-                } catch (error) {
-                    alert('Bir hata oluştu');
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Kullanıcı deaktifleştirilirken hata oluştu');
                 }
+            } catch (error) {
+                alert('Bir hata oluştu');
             }
         }
+    }
 
-        // Deactivate User
-        async function deactivateUser(userId) {
-            if (confirm('Kullanıcıyı deaktifleştirmek istediğinizden emin misiniz?')) {
-                try {
-                    const response = await fetch(`/api/auth/users/${userId}/deactivate`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Kullanıcı deaktifleştirilirken hata oluştu');
+    // Delete User
+    async function deleteUser(userId) {
+        if (confirm('Kullanıcıyı silmek istediğinizden emin misiniz?')) {
+            try {
+                const response = await fetch(`/api/auth/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
                     }
-                } catch (error) {
-                    alert('Bir hata oluştu');
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Kullanıcı silinirken hata oluştu');
                 }
+            } catch (error) {
+                alert('Bir hata oluştu');
             }
         }
-
-        // Delete User
-        async function deleteUser(userId) {
-            if (confirm('Kullanıcıyı silmek istediğinizden emin misiniz?')) {
-                try {
-                    const response = await fetch(`/api/auth/users/${userId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': 'Bearer ' + sessionStorage.getItem('accessToken')
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Kullanıcı silinirken hata oluştu');
-                    }
-                } catch (error) {
-                    alert('Bir hata oluştu');
-                }
-            }
-        }
-    </script>
-} 
+    }
+</script> 

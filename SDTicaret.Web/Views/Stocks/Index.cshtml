@@ -5,69 +5,255 @@
 }
 
 <div class="container-fluid">
-    <h1 class="h3 mb-2 text-gray-800">Stok Yönetimi</h1>
-    <p class="mb-4">Ürün stoklarını görüntüleyin ve yönetin.</p>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Stok Listesi</h6>
-            <a asp-action="Create" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus"></i> Yeni Stok Ekle
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-boxes me-2"></i>
+                Stok Yönetimi
+            </h1>
+            <p class="text-muted mb-0">@Model.Count() ürün stoku bulundu</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="input-group" style="max-width: 250px;">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Ürün ara...">
+            </div>
+            <a href="@Url.Action("Create", "Stocks")" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus me-1"></i>
+                Yeni Stok Ekle
             </a>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Ürün</th>
-                            <th>Miktar</th>
-                            <th>Minimum Stok</th>
-                            <th>Maksimum Stok</th>
-                            <th>Durum</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.Id</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.MinimumStock</td>
-                                <td>@item.MaximumStock</td>
-                                <td>
-                                    @if (item.Quantity <= item.MinimumStock)
-                                    {
-                                        <span class="badge badge-danger">Kritik</span>
-                                    }
-                                    else if (item.Quantity >= item.MaximumStock)
-                                    {
-                                        <span class="badge badge-warning">Fazla</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-success">Normal</span>
-                                    }
-                                </td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Toplam Ürün</h6>
+                            <h4 class="mb-0">@Model.Count()</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Normal Stok</h6>
+                            <h4 class="mb-0">@Model.Count(s => s.Quantity > s.MinimumStock && s.Quantity < s.MaximumStock)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Kritik Stok</h6>
+                            <h4 class="mb-0">@Model.Count(s => s.Quantity <= s.MinimumStock)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1 small">Fazla Stok</h6>
+                            <h4 class="mb-0">@Model.Count(s => s.Quantity >= s.MaximumStock)</h4>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div> 
+
+    <!-- Stocks Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list me-2"></i>
+                Stok Listesi
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">Ürün</th>
+                                <th class="border-0">Miktar</th>
+                                <th class="border-0">Minimum</th>
+                                <th class="border-0">Maksimum</th>
+                                <th class="border-0">Durum</th>
+                                <th class="border-0 text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stock in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="stock-icon bg-light rounded me-3">
+                                                <i class="bi bi-box text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 small">@stock.ProductName</h6>
+                                                <small class="text-muted">ID: @stock.Id</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>@stock.Quantity</strong>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@stock.MinimumStock</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@stock.MaximumStock</small>
+                                    </td>
+                                    <td>
+                                        @if (stock.Quantity <= stock.MinimumStock)
+                                        {
+                                            <span class="badge bg-danger">Kritik</span>
+                                        }
+                                        else if (stock.Quantity >= stock.MaximumStock)
+                                        {
+                                            <span class="badge bg-warning">Fazla</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Normal</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="@Url.Action("Details", "Stocks", new { id = stock.Id })" 
+                                               class="btn btn-outline-primary" title="Detay">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="@Url.Action("Edit", "Stocks", new { id = stock.Id })" 
+                                               class="btn btn-outline-success" title="Düzenle">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="@Url.Action("Delete", "Stocks", new { id = stock.Id })" 
+                                               class="btn btn-outline-danger" title="Sil"
+                                               onclick="return confirm('Bu stok kaydını silmek istediğinizden emin misiniz?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-boxes text-muted" style="font-size: 2rem;"></i>
+                    <p class="text-muted mt-2">Henüz stok kaydı bulunmuyor</p>
+                    <a href="@Url.Action("Create", "Stocks")" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus me-1"></i>
+                        İlk Stok Kaydını Ekle
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .stock-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .table th {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const productName = row.querySelector('h6').textContent.toLowerCase();
+            
+            if (productName.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script> 

@@ -7,6 +7,7 @@ public class DashboardStatsDto
     public int TotalOrders { get; set; }
     public int TotalCustomers { get; set; }
     public decimal TotalRevenue { get; set; }
+    public decimal TotalSales { get; set; }
     public decimal MonthlyRevenue { get; set; }
     public decimal WeeklyRevenue { get; set; }
     public decimal DailyRevenue { get; set; }

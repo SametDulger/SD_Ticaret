@@ -8,4 +8,6 @@ public class PaymentDto
     public DateTime PaymentDate { get; set; }
     public string PaymentType { get; set; } = null!;
     public string? PaymentMethod { get; set; }
+    public string Status { get; set; } = "Pending";
+    public bool IsActive { get; set; } = true;
 } 
