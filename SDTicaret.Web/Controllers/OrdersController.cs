@@ -33,6 +33,63 @@ namespace SDTicaret.Web.Controllers
             return View(new List<OrderDto>());
         }
 
+        public async Task<IActionResult> Pending()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("orders/pending");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<OrderDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View("Index", apiResponse?.Data ?? new List<OrderDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View("Index", new List<OrderDto>());
+        }
+
+        public async Task<IActionResult> Processing()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("orders/processing");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<OrderDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View("Index", apiResponse?.Data ?? new List<OrderDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View("Index", new List<OrderDto>());
+        }
+
+        public async Task<IActionResult> Shipped()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("orders/shipped");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<OrderDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View("Index", apiResponse?.Data ?? new List<OrderDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View("Index", new List<OrderDto>());
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             try
@@ -52,104 +109,160 @@ namespace SDTicaret.Web.Controllers
             return NotFound();
         }
 
+        public async Task<IActionResult> History(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"orders/{id}/history");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<OrderStatusHistoryDto>>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return View(apiResponse?.Data ?? new List<OrderStatusHistoryDto>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
+            }
+            return View(new List<OrderStatusHistoryDto>());
+        }
+
         public async Task<IActionResult> Create()
         {
             try
             {
-                // Müşterileri yükle
+                // Müşterileri getir
                 var customersResponse = await _httpClient.GetAsync("customers");
-                var customers = new List<CustomerDto>();
                 if (customersResponse.IsSuccessStatusCode)
                 {
                     var customersContent = await customersResponse.Content.ReadAsStringAsync();
                     var customersApiResponse = JsonSerializer.Deserialize<ApiResponse<List<CustomerDto>>>(customersContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    customers = customersApiResponse?.Data ?? new List<CustomerDto>();
+                    ViewBag.Customers = customersApiResponse?.Data ?? new List<CustomerDto>();
                 }
 
-                // Ürünleri yükle
+                // Ürünleri getir
                 var productsResponse = await _httpClient.GetAsync("products");
-                var products = new List<ProductDto>();
                 if (productsResponse.IsSuccessStatusCode)
                 {
                     var productsContent = await productsResponse.Content.ReadAsStringAsync();
                     var productsApiResponse = JsonSerializer.Deserialize<ApiResponse<List<ProductDto>>>(productsContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    products = productsApiResponse?.Data ?? new List<ProductDto>();
+                    ViewBag.Products = productsApiResponse?.Data ?? new List<ProductDto>();
                 }
-
-                ViewBag.Customers = customers;
-                ViewBag.Products = products;
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Veri yükleme hatası: {ex.Message}");
-                ViewBag.Customers = new List<CustomerDto>();
-                ViewBag.Products = new List<ProductDto>();
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
             }
-
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(OrderDto orderDto)
+        public async Task<IActionResult> Create(CreateOrderDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // OrderDate'i otomatik olarak ayarla
-                    orderDto.OrderDate = DateTime.Now;
-                    
-                    var json = JsonSerializer.Serialize(orderDto);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-                    var response = await _httpClient.PostAsync("orders", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"API Hatası: {errorContent}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Hata: {ex.Message}");
-                }
-            }
-            
-            // Hata durumunda dropdown'ları tekrar yükle
             try
             {
-                var customersResponse = await _httpClient.GetAsync("customers");
-                var customers = new List<CustomerDto>();
-                if (customersResponse.IsSuccessStatusCode)
-                {
-                    var customersContent = await customersResponse.Content.ReadAsStringAsync();
-                    var customersApiResponse = JsonSerializer.Deserialize<ApiResponse<List<CustomerDto>>>(customersContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    customers = customersApiResponse?.Data ?? new List<CustomerDto>();
-                }
+                var json = JsonSerializer.Serialize(dto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("orders/create", content);
 
-                var productsResponse = await _httpClient.GetAsync("products");
-                var products = new List<ProductDto>();
-                if (productsResponse.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    var productsContent = await productsResponse.Content.ReadAsStringAsync();
-                    var productsApiResponse = JsonSerializer.Deserialize<ApiResponse<List<ProductDto>>>(productsContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    products = productsApiResponse?.Data ?? new List<ProductDto>();
+                    TempData["SuccessMessage"] = "Sipariş başarıyla oluşturuldu";
+                    return RedirectToAction(nameof(Index));
                 }
-
-                ViewBag.Customers = customers;
-                ViewBag.Products = products;
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", $"Hata: {errorContent}");
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.Customers = new List<CustomerDto>();
-                ViewBag.Products = new List<ProductDto>();
+                ModelState.AddModelError("", $"Hata: {ex.Message}");
             }
-            
-            return View(orderDto);
+            return View(dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int id, string newStatus, string? notes = null, string? trackingNumber = null)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(token))
+                    return RedirectToAction("Login", "Auth");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var updateDto = new
+                {
+                    OrderId = id,
+                    NewStatus = newStatus,
+                    Notes = notes,
+                    TrackingNumber = trackingNumber,
+                    ChangedByUserId = HttpContext.Session.GetInt32("UserId"),
+                    ChangedByUserName = HttpContext.Session.GetString("UserName")
+                };
+
+                var json = JsonSerializer.Serialize(updateDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"orders/{id}/status", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "Sipariş durumu başarıyla güncellendi";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Sipariş durumu güncellenirken bir hata oluştu";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Hata: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelOrder(int id, string reason)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(token))
+                    return RedirectToAction("Login", "Auth");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var cancelDto = new
+                {
+                    Reason = reason,
+                    UserId = HttpContext.Session.GetInt32("UserId"),
+                    UserName = HttpContext.Session.GetString("UserName")
+                };
+
+                var json = JsonSerializer.Serialize(cancelDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"orders/{id}/cancel", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "Sipariş başarıyla iptal edildi";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Sipariş iptal edilirken bir hata oluştu";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Hata: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -168,77 +281,54 @@ namespace SDTicaret.Web.Controllers
             {
                 ModelState.AddModelError("", $"Hata: {ex.Message}");
             }
-            return RedirectToAction(nameof(Index));
+            return NotFound();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, OrderDto orderDto)
-        {
-            if (id != orderDto.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var json = JsonSerializer.Serialize(orderDto);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-                    var response = await _httpClient.PutAsync($"orders/{id}", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"API Hatası: {errorContent}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Hata: {ex.Message}");
-                }
-            }
-            return View(orderDto);
-        }
-
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Edit(OrderDto dto)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"orders/{id}");
+                var json = JsonSerializer.Serialize(dto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"orders/{dto.Id}", content);
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<OrderDto>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    return View(apiResponse?.Data);
+                    TempData["SuccessMessage"] = "Sipariş başarıyla güncellendi";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", $"Hata: {errorContent}");
                 }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Hata: {ex.Message}");
             }
-            return RedirectToAction(nameof(Index));
+            return View(dto);
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var response = await _httpClient.DeleteAsync($"orders/{id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["SuccessMessage"] = "Sipariş başarıyla silindi";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Sipariş silinirken bir hata oluştu";
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Hata: {ex.Message}");
+                TempData["ErrorMessage"] = $"Hata: {ex.Message}";
             }
             return RedirectToAction(nameof(Index));
         }
