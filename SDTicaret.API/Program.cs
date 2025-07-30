@@ -19,7 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Serilog konfigürasyonu 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 30)
     .CreateLogger();
@@ -131,6 +133,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 
+// Request/Response logging middleware
+builder.Services.AddSingleton<RequestResponseLoggingMiddleware>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -144,6 +149,7 @@ app.UseHttpsRedirection();
 
 // Global exception handling
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -109,28 +109,28 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
+    public Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
     {
-        var user = await _unitOfWork.Repository<User>().GetAsync(u => u.Email == forgotPasswordDto.Email);
-        if (user == null) return false;
+        var user = _unitOfWork.Repository<User>().GetAsync(u => u.Email == forgotPasswordDto.Email).Result;
+        if (user == null) return Task.FromResult(false);
 
         // Burada e-posta gönderme işlemi yapılacak
         // Şimdilik sadece true döndürüyoruz
-        return true;
+        return Task.FromResult(true);
     }
 
-    public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+    public Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
         // Token doğrulama işlemi burada yapılacak
         // Şimdilik sadece true döndürüyoruz
-        return true;
+        return Task.FromResult(true);
     }
 
-    public async Task<bool> ConfirmEmailAsync(string token)
+    public Task<bool> ConfirmEmailAsync(string token)
     {
         // Token doğrulama işlemi burada yapılacak
         // Şimdilik sadece true döndürüyoruz
-        return true;
+        return Task.FromResult(true);
     }
 
     public async Task<bool> LogoutAsync(int userId)
