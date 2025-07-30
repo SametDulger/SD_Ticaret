@@ -1,7 +1,7 @@
 # SD Ticaret Projesi Kurulum Rehberi
 
 ## Gereksinimler
-- .NET 8.0 SDK
+- .NET 9.0 SDK
 - SQL Server (Express, LocalDB veya Full)
 - Visual Studio 2022 veya VS Code
 

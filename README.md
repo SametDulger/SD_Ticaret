@@ -28,41 +28,7 @@ SD_Ticaret/
 
 ## 🔧 Kurulum
 
-### Gereksinimler
-- .NET 9 SDK
-- SQL Server
-
-### Adımlar
-
-1. **Repository'yi klonlayın**
-```bash
-git clone https://github.com/SametDulger/SD_Ticaret.git
-cd SD_Ticaret
-```
-
-2. **Veritabanı bağlantısını yapılandırın**
-```json
-// appsettings.json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=YOUR_SERVER;Database=SDTicaretDb;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true"
-  }
-}
-```
-
-3. **Migration'ları çalıştırın**
-```bash
-dotnet ef database update -p SDTicaret.Infrastructure -s SDTicaret.API
-```
-
-4. **Projeyi çalıştırın**
-```bash
-# API (https://localhost:7244)
-dotnet run --project SDTicaret.API
-
-# Web (https://localhost:7068)
-dotnet run --project SDTicaret.Web
-```
+Detaylı kurulum rehberi için [SETUP.md](SETUP.md) dosyasına bakın.
 
 ## 📝 API Dokümantasyonu
 
