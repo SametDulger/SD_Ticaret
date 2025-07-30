@@ -356,4 +356,66 @@ public class AuthController : Controller
 
         return View(new List<UserDto>());
     }
+
+    [HttpPost("users/{id}/activate")]
+    public async Task<IActionResult> ActivateUser(int id)
+    {
+        var token = HttpContext.Session.GetString("AccessToken");
+        var role = HttpContext.Session.GetString("Role");
+        
+        if (string.IsNullOrEmpty(token) || role != "Admin")
+            return RedirectToAction("Login", "Auth");
+
+        try
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await _httpClient.PutAsync($"api/users/{id}/activate", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Kullanıcı başarıyla aktifleştirildi";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Kullanıcı aktifleştirilirken bir hata oluştu";
+            }
+        }
+        catch (Exception)
+        {
+            TempData["ErrorMessage"] = "Kullanıcı aktifleştirilirken bir hata oluştu";
+        }
+
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost("users/{id}/deactivate")]
+    public async Task<IActionResult> DeactivateUser(int id)
+    {
+        var token = HttpContext.Session.GetString("AccessToken");
+        var role = HttpContext.Session.GetString("Role");
+        
+        if (string.IsNullOrEmpty(token) || role != "Admin")
+            return RedirectToAction("Login", "Auth");
+
+        try
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await _httpClient.PutAsync($"api/users/{id}/deactivate", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Kullanıcı başarıyla deaktifleştirildi";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Kullanıcı deaktifleştirilirken bir hata oluştu";
+            }
+        }
+        catch (Exception)
+        {
+            TempData["ErrorMessage"] = "Kullanıcı deaktifleştirilirken bir hata oluştu";
+        }
+
+        return RedirectToAction(nameof(Users));
+    }
 } 
