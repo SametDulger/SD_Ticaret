@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using FluentValidation;
 
 namespace SDTicaret.API.Middleware;
 
@@ -22,7 +23,23 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Beklenmeyen bir hata oluştu: {Message}", ex.Message);
+            var endpoint = context.Request.Path;
+            var method = context.Request.Method;
+            var query = context.Request.QueryString.ToString();
+            var user = context.User?.Identity?.IsAuthenticated == true ? context.User.Identity.Name : "Anonymous";
+
+            if (ex is ValidationException validationEx)
+            {
+                _logger.LogWarning(ex, "Validation error at {Endpoint} [{Method}] by {User} | Query: {Query} | Errors: {Errors}", endpoint, method, user, query, validationEx.Errors.Select(e => e.ErrorMessage));
+            }
+            else if (ex is UnauthorizedAccessException)
+            {
+                _logger.LogWarning(ex, "Unauthorized access at {Endpoint} [{Method}] by {User} | Query: {Query}", endpoint, method, user, query);
+            }
+            else
+            {
+                _logger.LogError(ex, "Exception at {Endpoint} [{Method}] by {User} | Query: {Query}", endpoint, method, user, query);
+            }
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -30,11 +47,22 @@ public class ExceptionHandlingMiddleware
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-
         object response;
 
         switch (exception)
         {
+            case ValidationException validationEx:
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response = new
+                {
+                    error = new
+                    {
+                        message = "Doğrulama hatası oluştu.",
+                        details = validationEx.Errors.Select(e => e.ErrorMessage),
+                        timestamp = DateTime.UtcNow
+                    }
+                };
+                break;
             case UnauthorizedAccessException:
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 response = new
@@ -47,7 +75,6 @@ public class ExceptionHandlingMiddleware
                     }
                 };
                 break;
-
             case InvalidOperationException:
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response = new
@@ -60,7 +87,6 @@ public class ExceptionHandlingMiddleware
                     }
                 };
                 break;
-
             case ArgumentException:
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response = new
@@ -73,7 +99,6 @@ public class ExceptionHandlingMiddleware
                     }
                 };
                 break;
-
             default:
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 response = new
