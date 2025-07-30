@@ -16,13 +16,14 @@ public class AuthService : IAuthService
     private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IJwtService jwtService, IConfiguration configuration)
+    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IJwtService jwtService, IEmailService emailService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _jwtService = jwtService;
-        _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<TokenDto> LoginAsync(LoginDto loginDto)
@@ -109,21 +110,38 @@ public class AuthService : IAuthService
         return true;
     }
 
-    public Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
     {
-        var user = _unitOfWork.Repository<User>().GetAsync(u => u.Email == forgotPasswordDto.Email).Result;
-        if (user == null) return Task.FromResult(false);
+        var user = await _unitOfWork.Repository<User>().GetAsync(u => u.Email == forgotPasswordDto.Email);
+        if (user == null) return false;
 
-        // Burada e-posta gönderme işlemi yapılacak
-        // Şimdilik sadece true döndürüyoruz
-        return Task.FromResult(true);
+        // Token üret
+        var token = Guid.NewGuid().ToString();
+        user.RefreshToken = token;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        // E-posta gönder
+        var resetLink = $"https://localhost:5080/reset-password?token={token}";
+        var subject = "Şifre Sıfırlama";
+        var body = $"Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:\n{resetLink}";
+        await _emailService.SendEmailAsync(user.Email, subject, body);
+
+        return true;
     }
 
-    public Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+    public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
     {
-        // Token doğrulama işlemi burada yapılacak
-        // Şimdilik sadece true döndürüyoruz
-        return Task.FromResult(true);
+        var user = await _unitOfWork.Repository<User>().GetAsync(u => u.RefreshToken == resetPasswordDto.Token && u.RefreshTokenExpiryTime > DateTime.UtcNow);
+        if (user == null) return false;
+
+        user.PasswordHash = HashPassword(resetPasswordDto.NewPassword);
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
     }
 
     public Task<bool> ConfirmEmailAsync(string token)
