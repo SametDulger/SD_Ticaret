@@ -3,7 +3,6 @@ using SDTicaret.Application.DTOs;
 using SDTicaret.Application.Interfaces;
 using SDTicaret.Core;
 using SDTicaret.Core.Entities;
-using SDTicaret.Core.Entities;
 using SDTicaret.Core.Interfaces;
 
 namespace SDTicaret.Application.Services;
